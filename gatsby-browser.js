@@ -1,17 +1,16 @@
-/**
- * Implement Gatsby's Browser APIs in this file.
- *
- * See: https://www.gatsbyjs.org/docs/browser-apis/
- */
-
-// You can delete this file if you're not using it
-
 import React from "react"
 import { StitchAuthProvider } from "./src/Auth/StitchAuth"
 import PropTypes from "prop-types"
 
+import GlobalStyles from "./src/components/Global/GlobalStyles"
+
 export const wrapPageElement = ({ element }) => {
-  return <StitchAuthProvider>{element}</StitchAuthProvider>
+  return (
+    <StitchAuthProvider>
+      <GlobalStyles />
+      {element}
+    </StitchAuthProvider>
+  )
 }
 
 wrapPageElement.propTypes = {
