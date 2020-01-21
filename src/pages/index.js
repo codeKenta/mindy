@@ -1,6 +1,5 @@
 import React from "react"
 import Layout from "../components/Layout/layout"
-// import { Layout } from "theme-ui"
 
 import AuthRequired from "../Auth/AuthRequired"
 import NewPost from "../components/NewPost/NewPost"
