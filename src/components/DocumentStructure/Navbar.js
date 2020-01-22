@@ -1,15 +1,8 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui"
+import React from "react"
 
 const Navbar = () => {
   return (
-    <nav
-      sx={{
-        padding: 4,
-        color: "text",
-        backgroundColor: "nav",
-      }}
-    >
+    <nav>
       <span>Mindy</span>
 
       <ul>

@@ -1,17 +1,8 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui"
-import { Heading } from "@theme-ui/components"
-
+import React from "react"
 const NewPost = () => {
   return (
-    <section
-      sx={{
-        padding: 4,
-        backgroundColor: "sectionBackground",
-        fonts: "body",
-      }}
-    >
-      <Heading as="h1">New story</Heading>
+    <section>
+      <h1>New story</h1>
       <form>
         <div className="form-group">
           <label htmlFor="title">title</label>

@@ -5,7 +5,7 @@ module.exports = {
     author: `Kenneth Österholm`,
   },
   plugins: [
-    "gatsby-plugin-theme-ui",
+    `gatsby-plugin-emotion`,
     `gatsby-plugin-react-helmet`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
