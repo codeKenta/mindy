@@ -5,15 +5,27 @@ import { useTheme } from "emotion-theming"
 
 const GlobalStyles = () => {
   const theme = useTheme()
-  console.log("GLOBAL STYLE,", theme)
   return (
     <Global
       styles={css`
         body {
           margin: 0;
-          font-family: ${styles.fonts.body};
+          font-family: ${styles.font.fontFamily.body};
           background: ${theme.background};
           color: ${theme.text};
+          line-height: ${styles.font.lineHeights.body};
+          letter-spacing: 0.1rem;
+        }
+        input,
+        textarea,
+        button {
+          letter-spacing: inherit;
+          font-family: inherit;
+          display: block;
+          box-sizing: border-box;
+          font-size: inherit;
+          line-height: inherit;
+          letter-spacing: inherit;
         }
       `}
     />

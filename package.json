@@ -8,6 +8,7 @@
     "@emotion/core": "^10.0.27",
     "@emotion/styled": "^10.0.27",
     "emotion-theming": "^10.0.27",
+    "final-form": "^4.18.7",
     "gatsby": "^2.18.12",
     "gatsby-image": "^2.2.34",
     "gatsby-plugin-emotion": "^4.1.21",
@@ -24,6 +25,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
+    "react-final-form": "^6.3.5",
     "react-helmet": "^5.2.1"
   },
   "devDependencies": {
