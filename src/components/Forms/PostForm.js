@@ -4,6 +4,8 @@ import { useTheme } from 'emotion-theming'
 import styled from '@emotion/styled'
 import styles from '../../Styles'
 import Button from '../Elements/Button'
+import CheckIcon from '../Icons/check'
+import DateInput from './DateInput/DateInput'
 import Heading from '../Elements/Heading'
 
 const PostForm = () => {
@@ -89,20 +91,21 @@ const PostForm = () => {
       border: 1px solid ${theme.primary};
       background-color: #34495e;
     }
+  `
 
-    input:checked::before {
-      content: url('check-solid.svg');
-      width: 1rem;
-      height: 1rem;
-      path {
-        color: red;
-      }
-      display: block;
-      text-align: center;
-      color: ${theme.primary};
-      position: absolute;
-      right: 0.65rem;
-      top: 0.15rem;
+  const CheckField = styled.div`
+    display: grid;
+    grid: 1fr / 1fr;
+    place-items: center;
+    svg,
+    input {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    svg {
+      order: 3;
+      max-width: 60%;
+      max-height: 60%;
     }
   `
   const CategoriesContainer = styled.div`
@@ -124,99 +127,178 @@ const PostForm = () => {
   return (
     <Form
       onSubmit={onSubmit}
-      validate={values => {
-        const errors = {}
-        if (!values.title) {
-          errors.title = 'You need to write a title'
-        }
-        if (!values.story) {
-          errors.story = 'You need to write your story'
-        }
-        if (!values.date) {
-          errors.date = 'You need a date for your story'
-        }
-        return errors
-      }}
       render={({ handleSubmit, form, submitting, pristine, values }) => (
-        // )}
-        // </Field>
-
-        /* <input {...input} type="text" placeholder="Username" /> */
-        /* <Field
-              className="input text"
-              name="title"
-              id="title"
-              component="input"
-            /> */
         <form onSubmit={handleSubmit}>
           <Field name="title">
             {({ input, meta }) => (
               <FormGroup className="title">
-                <Label>Title</Label>
-                <input {...input} className="input text" type="text" />
-
-                {meta.error && meta.touched && (
-                  <ErrorText>{meta.error}</ErrorText>
-                )}
+                <Label htmlFor="title">Title</Label>
+                <Field
+                  autoComplete="off"
+                  name="title"
+                  component="input"
+                  className="input text"
+                  required
+                />
               </FormGroup>
             )}
           </Field>
-
           <FormGroup className="story">
-            <Label>Story</Label>
-            <input className="input text" {...props.input} />
-            {/* <textarea className="input text">{input}</textarea> */}
+            <Label htmlFor="story">Story</Label>
+            <Field
+              name="story"
+              render={({ input }) => (
+                <textarea {...input} className="input text" />
+              )}
+            />
           </FormGroup>
-
           <FormGroup className="date">
             <Label htmlFor="date">Date</Label>
-            <input className="input text" type="date" name="date" id="date" />
+            <Field
+              name="date"
+              render={({ input }) => (
+                <DateInput className="input text" {...input} />
+              )}
+            />
           </FormGroup>
 
           <FormGroup className="category">
             <Label as="span">Category</Label>
 
             <CategoriesContainer>
+              <Field
+                type="checkbox"
+                name="category"
+                value="d"
+                render={({ input }) => (
+                  <CheckBoxWrapper>
+                    <input {...input} />
+                    <span>Dream</span>
+                  </CheckBoxWrapper>
+                )}
+              />
+
               <CheckBoxWrapper>
-                <input type="checkbox" name="category" value="d" />
-                <span>Dream</span>
+                <Field
+                  type="checkbox"
+                  name="category"
+                  value="vd"
+                  render={({ input }) => (
+                    <CheckBoxWrapper>
+                      <CheckField>
+                        {input.checked && <CheckIcon />}
+                        <input {...input} />
+                      </CheckField>
+                      <span>Vivid Dream</span>
+                    </CheckBoxWrapper>
+                  )}
+                />
               </CheckBoxWrapper>
 
               <CheckBoxWrapper>
-                <input type="checkbox" name="category" value="vd" />
-                <span>aaaaa aaaaa</span>
+                <Field
+                  type="checkbox"
+                  name="category"
+                  value="ld"
+                  render={({ input }) => (
+                    <CheckBoxWrapper>
+                      <CheckField>
+                        {input.checked && <CheckIcon />}
+                        <input {...input} />
+                      </CheckField>
+                      <span>Lucid Dream</span>
+                    </CheckBoxWrapper>
+                  )}
+                />
               </CheckBoxWrapper>
 
               <CheckBoxWrapper>
-                <input type="checkbox" name="category" value="ld" />
-                <span>aaaaa aaaaa</span>
-              </CheckBoxWrapper>
-              <CheckBoxWrapper>
-                <input id="sp" type="checkbox" name="category" value="sp" />
-                <span>aaaa aaaaa</span>
+                <Field
+                  type="checkbox"
+                  name="category"
+                  value="sp"
+                  render={({ input }) => (
+                    <CheckBoxWrapper>
+                      <CheckField>
+                        {input.checked && <CheckIcon />}
+                        <input {...input} />
+                      </CheckField>
+                      <span>Sleep Paralysis</span>
+                    </CheckBoxWrapper>
+                  )}
+                />
               </CheckBoxWrapper>
 
               <CheckBoxWrapper>
-                <input type="checkbox" name="category" value="obe" />
-                <span>aaa</span>
+                <Field
+                  type="checkbox"
+                  name="category"
+                  value="obe"
+                  render={({ input }) => (
+                    <CheckBoxWrapper>
+                      <CheckField>
+                        {input.checked && <CheckIcon />}
+                        <input {...input} />
+                      </CheckField>
+                      <span>OBE</span>
+                    </CheckBoxWrapper>
+                  )}
+                />
               </CheckBoxWrapper>
 
               <CheckBoxWrapper>
-                <input type="checkbox" name="category" value="ap" />
-                <span>Aaaaaa Paaaaaaaaa</span>
+                <Field
+                  type="checkbox"
+                  name="category"
+                  value="ap"
+                  render={({ input }) => (
+                    <CheckBoxWrapper>
+                      <CheckField>
+                        {input.checked && <CheckIcon />}
+                        <input {...input} />
+                      </CheckField>
+                      <span>Astral Projection</span>
+                    </CheckBoxWrapper>
+                  )}
+                />
               </CheckBoxWrapper>
+
               <CheckBoxWrapper>
-                <input type="checkbox" name="category" value="m" />
-                <span>aeaaitaaaa</span>
+                <Field
+                  type="checkbox"
+                  name="category"
+                  value="m"
+                  render={({ input }) => (
+                    <CheckBoxWrapper>
+                      <CheckField>
+                        {input.checked && <CheckIcon />}
+                        <input {...input} />
+                      </CheckField>
+                      <span>Meditation</span>
+                    </CheckBoxWrapper>
+                  )}
+                />
               </CheckBoxWrapper>
+
               <CheckBoxWrapper>
-                <input type="checkbox" name="category" value="o" />
-                <span>Other</span>
+                <Field
+                  type="checkbox"
+                  name="category"
+                  value="other"
+                  render={({ input }) => (
+                    <CheckBoxWrapper>
+                      <CheckField>
+                        {input.checked && <CheckIcon />}
+                        <input {...input} />
+                      </CheckField>
+                      <span>Other</span>
+                    </CheckBoxWrapper>
+                  )}
+                />
               </CheckBoxWrapper>
             </CategoriesContainer>
           </FormGroup>
-
-          <FormGroup className="img">
+          {/* <FormGroup className="img">
             <Label as="span">Img</Label>
             <div className="uploads-container">
               <div className="image-upload outer">
@@ -229,16 +311,26 @@ const PostForm = () => {
                 <div className="image-upload inner">img</div>
               </div>
             </div>
-          </FormGroup>
-
+          </FormGroup> */}
           <FormGroup className="public">
-            <Label htmlFor="puplic">Private / public</Label>
+            <Label htmlFor="is-public">Private / public</Label>
             <span>Do you want to share your experience?</span>
             <CheckBoxWrapper>
-              <input type="checkbox" name="public" id="puplic" />
+              <Field
+                type="checkbox"
+                name="public"
+                value={true}
+                render={({ input }) => (
+                  <CheckBoxWrapper>
+                    <CheckField>
+                      {input.checked && <CheckIcon />}
+                      <input id="is-public" {...input} />
+                    </CheckField>
+                  </CheckBoxWrapper>
+                )}
+              />
             </CheckBoxWrapper>
           </FormGroup>
-
           <Button>save</Button>
         </form>
       )}
