@@ -1,8 +1,7 @@
-import React from "react"
-import Layout from "../components/Layout/layout"
-
-import AuthRequired from "../Auth/AuthRequired"
-import NewPost from "../components/NewPost/NewPost"
+import React from 'react'
+import Layout from '../components/Layout/layout'
+import AuthRequired from '../Auth/AuthRequired'
+import NewPost from '../components/NewPost/NewPost'
 
 const IndexPage = () => {
   return (

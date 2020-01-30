@@ -1,11 +1,11 @@
 import { app } from './app'
-import { items } from './mongodb'
+import { experiences } from './mongodb'
 import {
   loginAnonymous,
   logoutCurrentUser,
   hasLoggedInUser,
-  getCurrentUser
+  getCurrentUser,
 } from './authentication'
 
-export { app, items }
+export { app, experiences }
 export { loginAnonymous, logoutCurrentUser, hasLoggedInUser, getCurrentUser }

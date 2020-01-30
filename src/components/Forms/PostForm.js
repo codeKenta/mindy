@@ -1,15 +1,22 @@
 import React from 'react'
 import { Form, Field } from 'react-final-form'
+import { useStitchAuth } from '../../Auth/StitchAuth'
 import { useTheme } from 'emotion-theming'
+import { useExperiences } from '../../store'
+
 import styled from '@emotion/styled'
 import styles from '../../Styles'
 import Button from '../Elements/Button'
 import CheckIcon from '../Icons/check'
 import DateInput from './DateInput/DateInput'
-import Heading from '../Elements/Heading'
 
 const PostForm = () => {
   const theme = useTheme()
+  const { currentUser } = useStitchAuth()
+  const experienceHook = useExperiences(currentUser)
+
+  console.log('EXP HOOK', experienceHook)
+  const { actions } = experienceHook
 
   const Label = styled.label`
     display: block;
@@ -19,6 +26,7 @@ const PostForm = () => {
   `
 
   const FormGroup = styled.div`
+    margin-bottom: ${styles.space.m};
     &.title {
       grid-area: titl;
     }
@@ -57,6 +65,10 @@ const PostForm = () => {
         background-color: #333436;
       }
     }
+
+    .react-datepicker-wrapper {
+      width: 100%;
+    }
   `
 
   const CheckBoxWrapper = styled.label`
@@ -68,12 +80,11 @@ const PostForm = () => {
     margin-right: 10px;
 
     span {
-      order: 1;
       width: max-content;
+      margin-right: 10px;
     }
 
     input {
-      order: 2;
       height: 1.5rem;
       width: 1.5rem;
       -webkit-appearance: none;
@@ -120,9 +131,11 @@ const PostForm = () => {
     color: hotpink;
   `
 
-  const onSubmit = form => {
+  const onSubmit = newExperience => {
     // event.preventDefault()
-    console.log('SUBMITTED', form)
+    console.log('SUBMITTED', newExperience)
+
+    actions.addExperience(newExperience)
   }
   return (
     <Form
@@ -172,8 +185,11 @@ const PostForm = () => {
                 value="d"
                 render={({ input }) => (
                   <CheckBoxWrapper>
-                    <input {...input} />
                     <span>Dream</span>
+                    <CheckField>
+                      {input.checked && <CheckIcon />}
+                      <input {...input} />
+                    </CheckField>
                   </CheckBoxWrapper>
                 )}
               />
@@ -185,11 +201,11 @@ const PostForm = () => {
                   value="vd"
                   render={({ input }) => (
                     <CheckBoxWrapper>
+                      <span>Vivid Dream</span>
                       <CheckField>
                         {input.checked && <CheckIcon />}
                         <input {...input} />
                       </CheckField>
-                      <span>Vivid Dream</span>
                     </CheckBoxWrapper>
                   )}
                 />
@@ -202,11 +218,11 @@ const PostForm = () => {
                   value="ld"
                   render={({ input }) => (
                     <CheckBoxWrapper>
+                      <span>Lucid Dream</span>
                       <CheckField>
                         {input.checked && <CheckIcon />}
                         <input {...input} />
                       </CheckField>
-                      <span>Lucid Dream</span>
                     </CheckBoxWrapper>
                   )}
                 />
@@ -219,11 +235,11 @@ const PostForm = () => {
                   value="sp"
                   render={({ input }) => (
                     <CheckBoxWrapper>
+                      <span>Sleep Paralysis</span>
                       <CheckField>
                         {input.checked && <CheckIcon />}
                         <input {...input} />
                       </CheckField>
-                      <span>Sleep Paralysis</span>
                     </CheckBoxWrapper>
                   )}
                 />
@@ -236,11 +252,11 @@ const PostForm = () => {
                   value="obe"
                   render={({ input }) => (
                     <CheckBoxWrapper>
+                      <span>OBE</span>
                       <CheckField>
                         {input.checked && <CheckIcon />}
                         <input {...input} />
                       </CheckField>
-                      <span>OBE</span>
                     </CheckBoxWrapper>
                   )}
                 />
@@ -253,11 +269,11 @@ const PostForm = () => {
                   value="ap"
                   render={({ input }) => (
                     <CheckBoxWrapper>
+                      <span>Astral Projection</span>
                       <CheckField>
                         {input.checked && <CheckIcon />}
                         <input {...input} />
                       </CheckField>
-                      <span>Astral Projection</span>
                     </CheckBoxWrapper>
                   )}
                 />
@@ -270,11 +286,11 @@ const PostForm = () => {
                   value="m"
                   render={({ input }) => (
                     <CheckBoxWrapper>
+                      <span>Meditation</span>
                       <CheckField>
                         {input.checked && <CheckIcon />}
                         <input {...input} />
                       </CheckField>
-                      <span>Meditation</span>
                     </CheckBoxWrapper>
                   )}
                 />
@@ -287,11 +303,11 @@ const PostForm = () => {
                   value="other"
                   render={({ input }) => (
                     <CheckBoxWrapper>
+                      <span>Other</span>
                       <CheckField>
                         {input.checked && <CheckIcon />}
                         <input {...input} />
                       </CheckField>
-                      <span>Other</span>
                     </CheckBoxWrapper>
                   )}
                 />

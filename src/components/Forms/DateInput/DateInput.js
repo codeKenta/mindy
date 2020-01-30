@@ -3,7 +3,6 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
 const DateInput = ({ onChange, className, id }) => {
-  console.log('IS THERE ENA ON CHANGE', onChange)
   const [date, setDate] = useState(new Date())
 
   const handleChange = date => {

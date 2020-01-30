@@ -1,10 +1,6 @@
 import React from 'react'
-import styled from '@emotion/styled'
-import { useTheme } from 'emotion-theming'
 
 const Check = () => {
-  const theme = useTheme()
-
   return (
     <svg
       aria-hidden="true"
