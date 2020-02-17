@@ -13,29 +13,35 @@ export function useExperiences(userId) {
   })
 
   const loadExperiences = async () => {
-    const loadedExperiences = await experiences
-      .find({}, { limit: 1000 })
-      .asArray()
-    dispatch({
-      type: actionTypes.loadExperiences,
-      payload: { loadedExperiences },
-    })
+    try {
+      const loadedExperiences = await experiences
+        .find({}, { limit: 1000 })
+        .asArray()
+
+      dispatch({
+        type: actionTypes.loadExperiences,
+        payload: { loadedExperiences },
+      })
+    } catch (error) {
+      console.log('error add exp', error)
+    }
   }
 
   const addExperience = async experience => {
-    console.log('ADD EXPERIENCE ACTION START', experience)
+    console.log('ACTION, income', experience)
+    const newExperience = { ...experience, owner_id: userId }
+    console.log('ACTION NEW EXP', newExperience)
 
-    const newExperience = { experience, owner_id: userId }
-    // dispatch({ type: actionTypes.loadingStart })
     const result = await experiences.insertOne(newExperience)
 
     dispatch({
       type: actionTypes.addExperience,
-      payload: { ...newExperience, _id: result.insertedId },
+      payload: { ...experience, _id: result.insertedId },
     })
   }
 
   React.useEffect(() => {
+    console.log('INIT USE EFFECT REDUCER')
     loadExperiences()
   }, [])
   return {
@@ -57,8 +63,7 @@ const experiencesReducer = (state, { type, payload }) => {
     }
 
     case actionTypes.loadExperiences: {
-      console.log('REDCER:LOADING EXPERIENCE:')
-
+      console.log('loaded experiences', payload.loadedExperiences)
       return {
         ...state,
         experiences: payload.loadedExperiences || [],
@@ -66,15 +71,16 @@ const experiencesReducer = (state, { type, payload }) => {
     }
 
     case actionTypes.addExperience: {
-      console.log('REDCER: ADD EXPERIENCE:+')
-
-      const newExperience = {
+      const updatedExperiences = [...state.experiences].push({
         ...payload,
-      }
+      })
+
+      console.log('ADD EXP REDUCER, Check the current exp state', state)
+
       return {
         ...state,
         loading: false,
-        experience: [...state.experience, newExperience],
+        experience: updatedExperiences,
       }
     }
 

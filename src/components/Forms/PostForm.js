@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Field } from 'react-final-form'
-import { useStitchAuth } from '../../Auth/StitchAuth'
 import { useTheme } from 'emotion-theming'
+import { useStitchAuth } from '../../Auth/StitchAuth'
 import { useExperiences } from '../../store'
 
 import styled from '@emotion/styled'
@@ -13,10 +13,7 @@ import DateInput from './DateInput/DateInput'
 const PostForm = () => {
   const theme = useTheme()
   const { currentUser } = useStitchAuth()
-  const experienceHook = useExperiences(currentUser)
-
-  console.log('EXP HOOK', experienceHook)
-  const { actions } = experienceHook
+  const { actions } = useExperiences(currentUser.id)
 
   const Label = styled.label`
     display: block;
@@ -131,11 +128,24 @@ const PostForm = () => {
     color: hotpink;
   `
 
-  const onSubmit = newExperience => {
+  const onSubmit = formInputs => {
     // event.preventDefault()
-    console.log('SUBMITTED', newExperience)
 
-    actions.addExperience(newExperience)
+    const { title, story, categories, isPublic } = formInputs
+
+    const date = formInputs.date ? new Date(formInputs.date) : new Date()
+
+    const data = {
+      title,
+      story,
+      date,
+      categories: categories || [],
+      isPublic: Boolean(isPublic),
+    }
+    console.log('SUBMITTED', formInputs)
+    console.log('data', data)
+
+    actions.addExperience(data)
   }
   return (
     <Form
@@ -181,7 +191,7 @@ const PostForm = () => {
             <CategoriesContainer>
               <Field
                 type="checkbox"
-                name="category"
+                name="categories"
                 value="d"
                 render={({ input }) => (
                   <CheckBoxWrapper>
@@ -197,7 +207,7 @@ const PostForm = () => {
               <CheckBoxWrapper>
                 <Field
                   type="checkbox"
-                  name="category"
+                  name="categories"
                   value="vd"
                   render={({ input }) => (
                     <CheckBoxWrapper>
@@ -214,7 +224,7 @@ const PostForm = () => {
               <CheckBoxWrapper>
                 <Field
                   type="checkbox"
-                  name="category"
+                  name="categories"
                   value="ld"
                   render={({ input }) => (
                     <CheckBoxWrapper>
@@ -231,7 +241,7 @@ const PostForm = () => {
               <CheckBoxWrapper>
                 <Field
                   type="checkbox"
-                  name="category"
+                  name="categories"
                   value="sp"
                   render={({ input }) => (
                     <CheckBoxWrapper>
@@ -248,7 +258,7 @@ const PostForm = () => {
               <CheckBoxWrapper>
                 <Field
                   type="checkbox"
-                  name="category"
+                  name="categories"
                   value="obe"
                   render={({ input }) => (
                     <CheckBoxWrapper>
@@ -265,7 +275,7 @@ const PostForm = () => {
               <CheckBoxWrapper>
                 <Field
                   type="checkbox"
-                  name="category"
+                  name="categories"
                   value="ap"
                   render={({ input }) => (
                     <CheckBoxWrapper>
@@ -282,7 +292,7 @@ const PostForm = () => {
               <CheckBoxWrapper>
                 <Field
                   type="checkbox"
-                  name="category"
+                  name="categories"
                   value="m"
                   render={({ input }) => (
                     <CheckBoxWrapper>
@@ -299,7 +309,7 @@ const PostForm = () => {
               <CheckBoxWrapper>
                 <Field
                   type="checkbox"
-                  name="category"
+                  name="categories"
                   value="other"
                   render={({ input }) => (
                     <CheckBoxWrapper>
@@ -334,7 +344,7 @@ const PostForm = () => {
             <CheckBoxWrapper>
               <Field
                 type="checkbox"
-                name="public"
+                name="isPublic"
                 value={true}
                 render={({ input }) => (
                   <CheckBoxWrapper>

@@ -1,3 +1,7 @@
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV}`,
+})
+
 module.exports = {
   siteMetadata: {
     title: `Mindy`,
@@ -38,7 +42,7 @@ module.exports = {
 
         //   `Nunito: 400, 400i, 700`, // you can also specify font weights and styles
         // ],
-        display: "swap",
+        display: 'swap',
       },
     },
 
