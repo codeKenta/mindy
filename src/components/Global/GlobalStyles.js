@@ -1,13 +1,16 @@
-import React from "react"
-import { css, Global } from "@emotion/core"
-import styles from "../../Styles"
-import { useTheme } from "emotion-theming"
+import React from 'react'
+import { css, Global } from '@emotion/core'
+import styles from '../../Styles'
+import { useTheme } from 'emotion-theming'
 
 const GlobalStyles = () => {
   const theme = useTheme()
   return (
     <Global
       styles={css`
+        * {
+          box-sizing: border-box;
+        }
         body {
           margin: 0;
           font-family: ${styles.font.fontFamily.body};

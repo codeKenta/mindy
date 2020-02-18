@@ -2,9 +2,16 @@ import React from 'react'
 import { experiences } from '../Auth/stitch'
 
 const actionTypes = {
-  loadingStart: 'loadingStart',
+  pendingStart: 'pendingStart',
+  errorOccured: 'errorOccured',
   addExperience: 'addExperience',
   loadExperiences: 'loadExperiences',
+}
+
+const statusNames = {
+  error: 'error',
+  pending: 'pending',
+  success: 'success',
 }
 
 export function useExperiences(userId) {
@@ -12,41 +19,60 @@ export function useExperiences(userId) {
     experiences: [],
   })
 
+  const pendingStart = () => {
+    dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
+  }
+
+  const errorOccured = errorMsg => {
+    dispatch({
+      type: actionTypes.errorOccured,
+      payload: {
+        message: errorMsg,
+      },
+    })
+  }
+
   const loadExperiences = async () => {
+    pendingStart()
     try {
       const loadedExperiences = await experiences
         .find({}, { limit: 1000 })
-        .asArray()
+        .toArray()
 
       dispatch({
         type: actionTypes.loadExperiences,
         payload: { loadedExperiences },
       })
     } catch (error) {
+      errorOccured('Failed to load the storys')
       console.log('error add exp', error)
     }
   }
 
   const addExperience = async experience => {
-    console.log('ACTION, income', experience)
+    pendingStart()
     const newExperience = { ...experience, owner_id: userId }
-    console.log('ACTION NEW EXP', newExperience)
-
-    const result = await experiences.insertOne(newExperience)
-
-    dispatch({
-      type: actionTypes.addExperience,
-      payload: { ...experience, _id: result.insertedId },
-    })
+    try {
+      const result = await experiences.insertOne(newExperience)
+      dispatch({
+        type: actionTypes.addExperience,
+        payload: { ...experience, _id: result.insertedId },
+      })
+    } catch (error) {
+      errorOccured('The story could not be saved')
+      console.log('error add exp', error)
+      throw Error(error)
+    }
   }
 
   React.useEffect(() => {
-    console.log('INIT USE EFFECT REDUCER')
     loadExperiences()
   }, [])
   return {
-    experience: state.experience,
-    loading: false,
+    experiences: state.experience,
+    status: null,
+    statusMessage: null,
+    statusNames,
     actions: {
       addExperience,
     },
@@ -55,18 +81,26 @@ export function useExperiences(userId) {
 
 const experiencesReducer = (state, { type, payload }) => {
   switch (type) {
-    case actionTypes.loadingStart: {
+    case actionTypes.pendingStart: {
       return {
         ...state,
-        loading: true,
+        status: statusNames.pending,
+      }
+    }
+
+    case actionTypes.errorOccured: {
+      return {
+        ...state,
+        status: statusNames.error,
+        statusMessage: payload.message,
       }
     }
 
     case actionTypes.loadExperiences: {
-      console.log('loaded experiences', payload.loadedExperiences)
       return {
         ...state,
         experiences: payload.loadedExperiences || [],
+        status: statusNames.success,
       }
     }
 
@@ -75,12 +109,11 @@ const experiencesReducer = (state, { type, payload }) => {
         ...payload,
       })
 
-      console.log('ADD EXP REDUCER, Check the current exp state', state)
-
       return {
         ...state,
-        loading: false,
-        experience: updatedExperiences,
+        status: statusNames.success,
+        statusMessage: 'Your story has been saved',
+        experiences: updatedExperiences,
       }
     }
 

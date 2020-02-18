@@ -79,18 +79,6 @@ export const helpers = {
     `,
 }
 
-// const StyledPageContent = styled.div`
-//   padding: ${space.xs};
-//   max-width: ${styles.contentMaxWidth};
-
-//   @media (min-width: ${breakpoints.m}) {
-//     padding: ${space.m};
-//   }
-//   @media (min-width: ${breakpoints.xl}) {
-//     padding: ${space.xl};
-//   }
-// `
-
 export const themes = {
   dark: {
     text: '#9EABC2',
@@ -102,6 +90,7 @@ export const themes = {
     primary: '#75ADF7',
     secondary: '#1D2843',
     complement: '#354A68',
+    disabled: '#414142',
   },
   light: {
     text: '#9EABC2',

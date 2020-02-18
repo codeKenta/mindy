@@ -1,10 +1,10 @@
 import React from 'react'
 import { useStitchAuth } from '../../Auth/StitchAuth'
-import { useExperiences } from '../../store'
+import { useExperiences } from '../../hooks/useExperiences'
 
 const Experiences = () => {
   const { currentUser } = useStitchAuth()
-  const { actions } = useExperiences(currentUser.id)
+  const { experiences } = useExperiences(currentUser.id)
 
   return <section>experiences</section>
 }

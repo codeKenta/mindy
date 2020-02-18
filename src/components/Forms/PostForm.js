@@ -2,7 +2,7 @@ import React from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useStitchAuth } from '../../Auth/StitchAuth'
-import { useExperiences } from '../../store'
+import { useExperiences } from '../../hooks/useExperiences'
 
 import styled from '@emotion/styled'
 import styles from '../../Styles'
@@ -13,7 +13,9 @@ import DateInput from './DateInput/DateInput'
 const PostForm = () => {
   const theme = useTheme()
   const { currentUser } = useStitchAuth()
-  const { actions } = useExperiences(currentUser.id)
+  const { actions, status, statusMessage, statusNames } = useExperiences(
+    currentUser.id
+  )
 
   const Label = styled.label`
     display: block;
@@ -70,6 +72,7 @@ const PostForm = () => {
 
   const CheckBoxWrapper = styled.label`
     margin-right: 10px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -103,7 +106,7 @@ const PostForm = () => {
 
   const CheckField = styled.div`
     display: grid;
-    grid: 1fr / 1fr;
+    grid: 1rem / 1rem;
     place-items: center;
     svg,
     input {
@@ -112,8 +115,8 @@ const PostForm = () => {
     }
     svg {
       order: 3;
-      max-width: 60%;
-      max-height: 60%;
+      max-width: 70%;
+      max-height: 70%;
     }
   `
   const CategoriesContainer = styled.div`
@@ -129,10 +132,8 @@ const PostForm = () => {
   `
 
   const onSubmit = formInputs => {
-    // event.preventDefault()
-
+    console.log(formInputs)
     const { title, story, categories, isPublic } = formInputs
-
     const date = formInputs.date ? new Date(formInputs.date) : new Date()
 
     const data = {
@@ -140,18 +141,20 @@ const PostForm = () => {
       story,
       date,
       categories: categories || [],
-      isPublic: Boolean(isPublic),
     }
-    console.log('SUBMITTED', formInputs)
-    console.log('data', data)
 
     actions.addExperience(data)
   }
   return (
     <Form
       onSubmit={onSubmit}
-      render={({ handleSubmit, form, submitting, pristine, values }) => (
-        <form onSubmit={handleSubmit}>
+      render={({ handleSubmit, form, submitting }) => (
+        <form
+          onSubmit={async event => {
+            await handleSubmit(event)
+            form.reset()
+          }}
+        >
           <Field name="title">
             {({ input, meta }) => (
               <FormGroup className="title">
@@ -338,26 +341,25 @@ const PostForm = () => {
               </div>
             </div>
           </FormGroup> */}
-          <FormGroup className="public">
+          {/* <FormGroup className="public">
             <Label htmlFor="is-public">Private / public</Label>
             <span>Do you want to share your experience?</span>
-            <CheckBoxWrapper>
-              <Field
-                type="checkbox"
-                name="isPublic"
-                value={true}
-                render={({ input }) => (
-                  <CheckBoxWrapper>
-                    <CheckField>
-                      {input.checked && <CheckIcon />}
-                      <input id="is-public" {...input} />
-                    </CheckField>
-                  </CheckBoxWrapper>
-                )}
-              />
-            </CheckBoxWrapper>
-          </FormGroup>
-          <Button>save</Button>
+
+            <Field
+              type="checkbox"
+              name="isPublic"
+              value={true}
+              render={({ input }) => (
+                <CheckBoxWrapper className="" as="div">
+                  <CheckField>
+                    {input.checked && <CheckIcon />}
+                    <input id="is-public" {...input} />
+                  </CheckField>
+                </CheckBoxWrapper>
+              )}
+            />
+          </FormGroup> */}
+          <Button disabled={submitting}>save</Button>
         </form>
       )}
     />
