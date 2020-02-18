@@ -1,0 +1,56 @@
+{
+  "title": "experiences-dev",
+  "properties": {
+    "_id": {
+      "bsonType": "objectId"
+    },
+    "owner_id": {
+      "bsonType": "string"
+    },
+    "title": {
+      "bsonType": "string"
+    },
+    "story": {
+      "bsonType": "string"
+    },
+    "date": {
+      "bsonType": "date"
+    },
+    "categories": {
+      "bsonType": "array"
+    },
+    "isPublic": {
+      "bsonType": "bool"
+    }
+  },
+  "title": "tester",
+  "properties": {
+    "_id": {
+      "bsonType": "objectId"
+    },
+    "categories": {
+      "bsonType": "array"
+    },
+    "category": {
+      "bsonType": "array"
+    },
+    "isPublic": {
+      "bsonType": "bool"
+    },
+    "owner_id": {
+      "bsonType": "string"
+    },
+    "public": {
+      "bsonType": "array"
+    },
+    "story": {
+      "bsonType": "string"
+    },
+    "task": {
+      "bsonType": "string"
+    },
+    "title": {
+      "bsonType": "string"
+    }
+  }
+}
