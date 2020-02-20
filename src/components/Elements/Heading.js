@@ -1,8 +1,8 @@
-import React from "react"
-import styled from "@emotion/styled"
-import PropTypes from "prop-types"
-import styles from "../../Styles"
-import { useTheme } from "emotion-theming"
+import React from 'react'
+import styled from '@emotion/styled'
+import PropTypes from 'prop-types'
+import styles from '../../Styles'
+import { useTheme } from 'emotion-theming'
 
 const Heading = ({ children, className, level }) => {
   const theme = useTheme()
@@ -13,15 +13,18 @@ const Heading = ({ children, className, level }) => {
     color: ${theme.primary};
     lineHeight: ${styles.font.lineHeights.heading}
     ${props.fontSize ? `font-size: ${props.fontSize};` : null}
+    ${props.marginBottom && `margin-bottom: ${props.marginBottom};`}
   `
   )
 
   const sizes = styles.font.fontSize
   let fontSize
+  let marginBottom
 
   switch (level) {
     case 1:
       fontSize = sizes.h1
+      marginBottom = '2rem'
       break
 
     case 2:
@@ -54,6 +57,7 @@ const Heading = ({ children, className, level }) => {
       className={className}
       fontSize={fontSize}
       level={level}
+      marginBottom={marginBottom}
     >
       {children}
     </StyledHeading>
@@ -67,7 +71,7 @@ Heading.propTypes = {
 }
 
 Heading.defaultProps = {
-  className: "",
+  className: '',
 }
 
 export default Heading

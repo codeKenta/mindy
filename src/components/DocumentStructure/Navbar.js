@@ -1,14 +1,26 @@
 import React from 'react'
+import { Link } from 'gatsby'
 import styled from '@emotion/styled'
 import styles, { helpers } from '../../Styles'
+
+const { space, contentMaxWidth, gridLines } = styles
 
 const StyledNavbar = styled.nav`
   background: darkslateblue;
   display: grid;
   ${helpers.useGlobalLayout}
-  grid-column: ${styles.gridLines.column.mainStart} /
-    ${styles.gridLines.column.mainEnd};
+  grid-column: ${gridLines.column.mainStart} /
+    ${gridLines.column.mainEnd};
   grid-row: main-start / content-start;
+`
+
+const Menu = styled.ul`
+  padding: 0;
+  a {
+    color: white;
+    text-decoration: none;
+    margin-left: ${space.s};
+  }
 `
 
 const ContentWrapper = styled.div`
@@ -23,10 +35,10 @@ const Navbar = () => {
       <ContentWrapper>
         <span>Mindy</span>
 
-        <ul>
-          <li>link 1</li>
-          <li>link 2</li>
-        </ul>
+        <Menu>
+          <Link to="/">Your stories</Link>
+          <Link to="/story">New story</Link>
+        </Menu>
       </ContentWrapper>
     </StyledNavbar>
   )

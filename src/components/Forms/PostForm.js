@@ -1,7 +1,6 @@
 import React from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
-import { useStitchAuth } from '../../Auth/StitchAuth'
 import { useExperiences } from '../../hooks/useExperiences'
 
 import styled from '@emotion/styled'
@@ -9,13 +8,11 @@ import styles from '../../Styles'
 import Button from '../Elements/Button'
 import CheckIcon from '../Icons/check'
 import DateInput from './DateInput/DateInput'
+import Editor from './Editor/Editor'
 
 const PostForm = () => {
   const theme = useTheme()
-  const { currentUser } = useStitchAuth()
-  const { actions, status, statusMessage, statusNames } = useExperiences(
-    currentUser.id
-  )
+  const { actions, statusNames, status, statusMessage } = useExperiences()
 
   const Label = styled.label`
     display: block;
@@ -127,14 +124,13 @@ const PostForm = () => {
     padding: ${styles.space.s};
   `
 
-  const ErrorText = styled.span`
-    color: hotpink;
-  `
+  const StyledForm = styled.form``
 
   const onSubmit = formInputs => {
-    console.log(formInputs)
     const { title, story, categories, isPublic } = formInputs
     const date = formInputs.date ? new Date(formInputs.date) : new Date()
+
+    console.log('FOORM INPUT', formInputs)
 
     const data = {
       title,
@@ -145,11 +141,12 @@ const PostForm = () => {
 
     actions.addExperience(data)
   }
+
   return (
     <Form
       onSubmit={onSubmit}
       render={({ handleSubmit, form, submitting }) => (
-        <form
+        <StyledForm
           onSubmit={async event => {
             await handleSubmit(event)
             form.reset()
@@ -169,6 +166,7 @@ const PostForm = () => {
               </FormGroup>
             )}
           </Field>
+
           <FormGroup className="story">
             <Label htmlFor="story">Story</Label>
             <Field
@@ -178,6 +176,12 @@ const PostForm = () => {
               )}
             />
           </FormGroup>
+
+          <FormGroup className="story">
+            <Label htmlFor="story">Story</Label>
+            <Field name="story-editor" component={Editor} />
+          </FormGroup>
+
           <FormGroup className="date">
             <Label htmlFor="date">Date</Label>
             <Field
@@ -192,20 +196,22 @@ const PostForm = () => {
             <Label as="span">Category</Label>
 
             <CategoriesContainer>
-              <Field
-                type="checkbox"
-                name="categories"
-                value="d"
-                render={({ input }) => (
-                  <CheckBoxWrapper>
-                    <span>Dream</span>
-                    <CheckField>
-                      {input.checked && <CheckIcon />}
-                      <input {...input} />
-                    </CheckField>
-                  </CheckBoxWrapper>
-                )}
-              />
+              <CheckBoxWrapper>
+                <Field
+                  type="checkbox"
+                  name="categories"
+                  value="d"
+                  render={({ input }) => (
+                    <CheckBoxWrapper>
+                      <span>Dream</span>
+                      <CheckField>
+                        {input.checked && <CheckIcon />}
+                        <input {...input} />
+                      </CheckField>
+                    </CheckBoxWrapper>
+                  )}
+                />
+              </CheckBoxWrapper>
 
               <CheckBoxWrapper>
                 <Field
@@ -360,7 +366,10 @@ const PostForm = () => {
             />
           </FormGroup> */}
           <Button disabled={submitting}>save</Button>
-        </form>
+          {status === statusNames.addExperienceSuccess ? (
+            <p>{statusMessage}</p>
+          ) : null}
+        </StyledForm>
       )}
     />
   )

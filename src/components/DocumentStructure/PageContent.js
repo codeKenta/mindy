@@ -6,7 +6,7 @@ import styles, { helpers } from '../../Styles'
 
 const StyledPageContent = styled.div`
   width: 100%;
-  padding: ${styles.space.m} 0;
+  padding: ${styles.space.xl} 0;
   place-self: center;
   ${helpers.placeContentInLayout}
 `

@@ -21,12 +21,14 @@ const Button = ({ children, clickHandler, disabled }) => {
     &:active  {
       border: 1px solid ${theme.complement};
     }
-    &:hover(:not:hover) {
+    &:hover {
       background: ${theme.primary};
       border: 1px solid ${theme.primary};
       color: ${theme.background};
     }
-    &:disabled {
+
+    &:disabled,
+    &:disabled:hover {
       border: 1px solid ${theme.disabled};
       color: ${theme.disabled};
       cursor: not-allowed;

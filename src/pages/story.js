@@ -1,12 +1,15 @@
 import React from 'react'
 import Layout from '../components/Layout/layout'
 import AuthRequired from '../Auth/AuthRequired'
-import ExperiencesPage from '../components/ExperiencesPage/ExperiencesPage'
+import NewPost from '../components/NewPost/NewPost'
+import { useTheme } from 'emotion-theming'
+
 const IndexPage = () => {
+  const theme = useTheme()
   return (
-    <Layout>
+    <Layout background={theme.sectionBackground}>
       <AuthRequired>
-        <ExperiencesPage />
+        <NewPost />
       </AuthRequired>
     </Layout>
   )

@@ -11,11 +11,12 @@ const LayoutWrapper = styled.div`
   min-height: 100vh;
   ${helpers.useGlobalLayout};
   grid-template-rows: [main-start] 70px [content-start] max-content [footer-start] max-content [main-end];
+  ${props => `background: ${props.background}`};
 `
 
-const Layout = ({ children }) => {
+const Layout = ({ background, children }) => {
   return (
-    <LayoutWrapper>
+    <LayoutWrapper background={background}>
       <Navbar />
       <PageContent as="main">{children}</PageContent>
       <Footer />
@@ -25,6 +26,7 @@ const Layout = ({ children }) => {
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
+  background: PropTypes.string,
 }
 
 export default Layout

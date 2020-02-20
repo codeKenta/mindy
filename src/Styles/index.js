@@ -23,7 +23,7 @@ const styles = {
     },
     fontSize: {
       root: '18px',
-      h1: '2.3rem',
+      h1: '3rem',
       h2: '1.6rem',
       h3: '1.4rem',
       h4: '1.2rem',
@@ -39,7 +39,6 @@ const styles = {
     xl: '25px',
     xxl: '50px',
   },
-
   radius: {
     xs: '2px',
     s: '5px',
@@ -84,7 +83,7 @@ export const themes = {
     text: '#9EABC2',
     secondaryText: '#636974',
     background: '#191919',
-    sectionBackground: '#1D1D1D',
+    sectionBackground: '#111212',
     fieldBackground: '#26282c',
     nav: '#141926',
     primary: '#75ADF7',
