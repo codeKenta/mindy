@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useExperiences } from '../../hooks/useExperiences'
@@ -8,11 +8,14 @@ import styles from '../../Styles'
 import Button from '../Elements/Button'
 import CheckIcon from '../Icons/check'
 import DateInput from './DateInput/DateInput'
-import Editor from './Editor/Editor'
-
+// import Editor from './Editor/Editor'
+import DropZone from './DropZone/DropZone'
+import ImagePreview from './ImagePreview/ImagePreview'
 const PostForm = () => {
   const theme = useTheme()
   const { actions, statusNames, status, statusMessage } = useExperiences()
+
+  const [images, setImages] = useState([])
 
   const Label = styled.label`
     display: block;
@@ -68,13 +71,11 @@ const PostForm = () => {
   `
 
   const CheckBoxWrapper = styled.label`
-    margin-right: 10px;
-    margin-bottom: 10px;
+    margin: 5px 10px;
     display: flex;
     align-items: center;
     cursor: pointer;
     position: relative;
-    margin-right: 10px;
 
     span {
       width: max-content;
@@ -124,10 +125,21 @@ const PostForm = () => {
     padding: ${styles.space.s};
   `
 
-  const StyledForm = styled.form``
+  // const DropZoneContainer = styled.div`
+  //   display: grid;
+  //   width: 100%;
+  //   height: 100%;
+  // `
+
+  const ImagesContainer = styled.div`
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 100px 250px;
+    grid-gap: ${styles.space.l};
+  `
 
   const onSubmit = formInputs => {
-    const { title, story, categories, isPublic } = formInputs
+    const { title, story, categories } = formInputs
     const date = formInputs.date ? new Date(formInputs.date) : new Date()
 
     console.log('FOORM INPUT', formInputs)
@@ -137,6 +149,7 @@ const PostForm = () => {
       story,
       date,
       categories: categories || [],
+      isPublic: false,
     }
 
     actions.addExperience(data)
@@ -146,7 +159,7 @@ const PostForm = () => {
     <Form
       onSubmit={onSubmit}
       render={({ handleSubmit, form, submitting }) => (
-        <StyledForm
+        <form
           onSubmit={async event => {
             await handleSubmit(event)
             form.reset()
@@ -177,10 +190,10 @@ const PostForm = () => {
             />
           </FormGroup>
 
-          <FormGroup className="story">
+          {/* <FormGroup className="story">
             <Label htmlFor="story">Story</Label>
             <Field name="story-editor" component={Editor} />
-          </FormGroup>
+          </FormGroup> */}
 
           <FormGroup className="date">
             <Label htmlFor="date">Date</Label>
@@ -333,20 +346,16 @@ const PostForm = () => {
               </CheckBoxWrapper>
             </CategoriesContainer>
           </FormGroup>
-          {/* <FormGroup className="img">
-            <Label as="span">Img</Label>
-            <div className="uploads-container">
-              <div className="image-upload outer">
-                <div className="image-upload inner">img</div>
-              </div>
-              <div className="image-upload outer">
-                <div className="image-upload inner">img</div>
-              </div>
-              <div className="image-upload outer">
-                <div className="image-upload inner">img</div>
-              </div>
-            </div>
-          </FormGroup> */}
+
+          <FormGroup className="img">
+            <Label as="span">Images</Label>
+            <ImagesContainer>
+              {/* <DropZoneContainer> */}
+              <DropZone images={images} handleImages={setImages} />
+              {/* </DropZoneContainer> */}
+              <ImagePreview images={images} />
+            </ImagesContainer>
+          </FormGroup>
           {/* <FormGroup className="public">
             <Label htmlFor="is-public">Private / public</Label>
             <span>Do you want to share your experience?</span>
@@ -369,7 +378,7 @@ const PostForm = () => {
           {status === statusNames.addExperienceSuccess ? (
             <p>{statusMessage}</p>
           ) : null}
-        </StyledForm>
+        </form>
       )}
     />
   )

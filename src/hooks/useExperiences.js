@@ -11,13 +11,14 @@ export const ExperiencesProvider = ({ children }) => {
     statusMessage: null,
   })
 
+  const { isLoggedIn } = useStitchAuth()
+
   React.useEffect(() => {
     const loadExperiences = async () => {
       dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
       try {
         const loadedExperiences = await experiences
-          .find()
-          // .sort({ date: -1 })
+          .find({}, { sort: { date: -1 } })
           .asArray()
 
         dispatch({
@@ -34,8 +35,10 @@ export const ExperiencesProvider = ({ children }) => {
         console.log('error add exp', error)
       }
     }
-    loadExperiences()
-  }, [])
+    if (isLoggedIn) {
+      loadExperiences()
+    }
+  }, [isLoggedIn])
 
   return (
     <ExperiencesContext.Provider value={[state, dispatch]}>
@@ -58,7 +61,7 @@ const statusNames = {
   addExperienceSuccess: 'add-experiences-success',
 }
 
-export const useExperiences = userId => {
+export const useExperiences = () => {
   const [state, dispatch] = useContext(ExperiencesContext)
   const { currentUser } = useStitchAuth()
 

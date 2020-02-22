@@ -8,9 +8,10 @@ import styled from '@emotion/styled'
 import styles from '../../Styles'
 
 const ExperiencesPage = () => {
-  const { currentUser } = useStitchAuth()
-  const { experiences } = useExperiences(currentUser.id)
+  const { experiences } = useExperiences()
   const theme = useTheme()
+
+
 
   const Section = styled.section``
   const Experience = styled.article`

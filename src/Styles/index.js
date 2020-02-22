@@ -79,17 +79,33 @@ export const helpers = {
 }
 
 export const themes = {
+  // dark: {
+  //   text: 'rgb(252, 224, 187)',
+  //   secondaryText: 'rgb(237, 107, 127)',
+  //   background: '#191919',
+  //   sectionBackground: '#111212',
+  //   fieldBackground: '#26282c',
+  //   extraBackground: 'rgb(30,31,65)',
+
+  //   nav: 'rgb(30,31,65)',
+  //   primary: 'rgb(237, 107, 127)',
+  //   secondary: 'rgb(176, 80, 108)',
+  //   complement: '#354A68',
+  //   disabled: '#414142',
+  // },
   dark: {
     text: '#9EABC2',
     secondaryText: '#636974',
     background: '#191919',
     sectionBackground: '#111212',
     fieldBackground: '#26282c',
-    nav: '#141926',
+    nav: 'rgb(30,31,65)',
     primary: '#75ADF7',
     secondary: '#1D2843',
     complement: '#354A68',
     disabled: '#414142',
+    success: '#00A56F',
+    error: '#EF176E',
   },
   light: {
     text: '#9EABC2',

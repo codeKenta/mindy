@@ -2,17 +2,9 @@ import React from 'react'
 import { Link } from 'gatsby'
 import styled from '@emotion/styled'
 import styles, { helpers } from '../../Styles'
+import { useTheme } from 'emotion-theming'
 
 const { space, contentMaxWidth, gridLines } = styles
-
-const StyledNavbar = styled.nav`
-  background: darkslateblue;
-  display: grid;
-  ${helpers.useGlobalLayout}
-  grid-column: ${gridLines.column.mainStart} /
-    ${gridLines.column.mainEnd};
-  grid-row: main-start / content-start;
-`
 
 const Menu = styled.ul`
   padding: 0;
@@ -30,6 +22,17 @@ const ContentWrapper = styled.div`
   ${helpers.placeContentInLayout}
 `
 const Navbar = () => {
+  const theme = useTheme()
+
+  const StyledNavbar = styled.nav`
+  background: ${theme.nav};
+  display: grid;
+  ${helpers.useGlobalLayout}
+  grid-column: ${gridLines.column.mainStart} /
+    ${gridLines.column.mainEnd};
+  grid-row: main-start / content-start;
+`
+
   return (
     <StyledNavbar>
       <ContentWrapper>
