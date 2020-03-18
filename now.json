@@ -1,0 +1,11 @@
+{
+  "name": "mindy",
+  "version": 2,
+  "build": {
+    "env": {
+      "GATSBY_DB_NAME": "@mindy-db-name",
+      "GATSBY_COLLECTION_NAME": "@mindy-collection-name",
+      "GATSBY_APP_ID": "@mindy-app-id"
+    }
+  }
+}
