@@ -1,17 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Moment from 'react-moment'
-import { useStitchAuth } from '../../Auth/StitchAuth'
-import { useExperiences } from '../../hooks/useExperiences'
+// import { useStitchAuth } from '../../Auth/StitchAuth'
+// import { useExperiences } from '../../hooks/useExperiences'
 import { useTheme } from 'emotion-theming'
 import Heading from '../Elements/Heading'
 import styled from '@emotion/styled'
 import styles from '../../Styles'
 
 const ExperiencesPage = () => {
-  const { experiences } = useExperiences()
+  // const { experiences } = useExperiences()
+  const [experiences, setExperiences] = useState([]) // <--- make hook to replace
   const theme = useTheme()
-
-
 
   const Section = styled.section``
   const Experience = styled.article`

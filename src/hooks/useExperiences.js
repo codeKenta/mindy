@@ -1,7 +1,6 @@
 import React, { useContext, useReducer } from 'react'
-import { experiences } from '../Auth/stitch'
-import { useStitchAuth } from '../Auth/StitchAuth'
-
+import { useSession } from '../Firebase/Auth/Auth'
+import db from '../Firebase/db'
 const ExperiencesContext = React.createContext(null)
 
 export const ExperiencesProvider = ({ children }) => {
@@ -11,34 +10,33 @@ export const ExperiencesProvider = ({ children }) => {
     statusMessage: null,
   })
 
-  const { isLoggedIn } = useStitchAuth()
+  const user = useSession()
 
   React.useEffect(() => {
     const loadExperiences = async () => {
       dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
-      try {
-        const loadedExperiences = await experiences
-          .find({}, { sort: { date: -1 } })
-          .asArray()
+      // try {
+      /* TODO: FETCH DOCUMENT WITH FIREBASE */
 
-        dispatch({
-          type: actionTypes.loadExperiences,
-          payload: { loadedExperiences },
-        })
-      } catch (error) {
-        dispatch({
-          type: actionTypes.errorOccured,
-          payload: {
-            message: 'Failed to load the storys',
-          },
-        })
-        console.log('error add exp', error)
-      }
+      const loadedExperiences = []
+      dispatch({
+        type: actionTypes.loadExperiences,
+        payload: { loadedExperiences },
+      })
+      // } catch (error) {
+      //   dispatch({
+      //     type: actionTypes.errorOccured,
+      //     payload: {
+      //       message: 'Failed to load the storys',
+      //     },
+      //   })
+      //   console.log('error add exp', error)
+      // }
     }
-    if (isLoggedIn) {
+    if (user) {
       loadExperiences()
     }
-  }, [isLoggedIn])
+  }, [user])
 
   return (
     <ExperiencesContext.Provider value={[state, dispatch]}>
@@ -63,7 +61,7 @@ const statusNames = {
 
 export const useExperiences = () => {
   const [state, dispatch] = useContext(ExperiencesContext)
-  const { currentUser } = useStitchAuth()
+  const user = useSession()
 
   const pendingStart = () => {
     dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
@@ -80,12 +78,13 @@ export const useExperiences = () => {
 
   const addExperience = async experience => {
     pendingStart()
-    const newExperience = { ...experience, owner_id: currentUser.id }
+    const newExperience = { ...experience, uid: user.uid }
     try {
-      const result = await experiences.insertOne(newExperience)
+      const result = await db.addExperience(newExperience)
       dispatch({
         type: actionTypes.addExperience,
-        payload: { ...experience, _id: result.insertedId },
+        payload: { ...experience },
+        // payload: { ...experience, _id: result.insertedId },
       })
     } catch (error) {
       errorOccured('The story could not be saved')
