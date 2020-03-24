@@ -1,3 +1,5 @@
+/*
+
 import React, { useContext, useReducer } from 'react'
 import { experiences } from '../Auth/stitch'
 import { useStitchAuth } from '../Auth/StitchAuth'
@@ -149,3 +151,6 @@ const experiencesReducer = (state, { type, payload }) => {
     }
   }
 }
+
+
+*/

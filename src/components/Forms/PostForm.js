@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
-import { useExperiences } from '../../hooks/useExperiences'
+// import { useExperiences } from '../../hooks/useExperiences'
 
 import styled from '@emotion/styled'
 import styles from '../../Styles'
@@ -13,8 +13,11 @@ import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
 const PostForm = () => {
   const theme = useTheme()
-  const { actions, statusNames, status, statusMessage } = useExperiences()
+  // const { actions, statusNames, status, statusMessage } = useExperiences()
 
+  const statusNames = {}
+  const status = ''
+  const statusMessage = ''
   const [images, setImages] = useState([])
 
   const Label = styled.label`
@@ -152,7 +155,7 @@ const PostForm = () => {
       isPublic: false,
     }
 
-    actions.addExperience(data)
+    // actions.addExperience(data)
   }
 
   return (

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useStitchAuth } from '../../Auth/StitchAuth'
+import { useSession, useAuth } from '../../Auth/Auth'
 import styled from '@emotion/styled'
 import styles, { helpers } from '../../Styles'
 
@@ -17,16 +17,14 @@ const ContentWrapper = styled.div`
   ${helpers.placeContentInLayout}
 `
 const Footer = () => {
-  const {
-    isLoggedIn,
-    actions: { handleLogout },
-  } = useStitchAuth()
+  const user = useSession()
+  const { signOut } = useAuth()
 
   return (
     <StyledFooter>
       <ContentWrapper>
         <span>Mindy</span>
-        {isLoggedIn && <button onClick={handleLogout}>Log out</button>}
+        {user && <button onClick={signOut}>Log out</button>}
       </ContentWrapper>
     </StyledFooter>
   )
