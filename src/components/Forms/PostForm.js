@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 // import { useExperiences } from '../../hooks/useExperiences'
-
+import { addExperience } from '../../Auth/db'
 import styled from '@emotion/styled'
 import styles from '../../Styles'
 import Button from '../Elements/Button'
@@ -155,6 +155,7 @@ const PostForm = () => {
       isPublic: false,
     }
 
+    addExperience(data)
     // actions.addExperience(data)
   }
 

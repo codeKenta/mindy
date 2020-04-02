@@ -4,7 +4,6 @@ import 'firebase/auth'
 import PropTypes from 'prop-types'
 import { useContext } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
-// import { userContext } from './user-context'
 import { firebaseConfig } from './config'
 
 /*
@@ -12,13 +11,16 @@ import { firebaseConfig } from './config'
 Firebase methods
 
 */
-let auth, provider
+let auth, provider, db
 if (typeof window !== 'undefined') {
   firebase.initializeApp(firebaseConfig)
   auth = firebase.auth()
   auth.useDeviceLanguage()
   provider = new firebase.auth.GoogleAuthProvider()
+  db = firebase.firestore();
 }
+
+export const db
 
 const signInWithGoogle = async () => {
   try {
