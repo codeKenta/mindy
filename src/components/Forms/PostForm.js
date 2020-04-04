@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
+import { useSession } from '../../Auth/Auth'
 // import { useExperiences } from '../../hooks/useExperiences'
 import { addExperience } from '../../Auth/db'
 import styled from '@emotion/styled'
@@ -13,6 +14,7 @@ import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
 const PostForm = () => {
   const theme = useTheme()
+  const userId = useSession()
   // const { actions, statusNames, status, statusMessage } = useExperiences()
 
   const statusNames = {}
@@ -141,13 +143,14 @@ const PostForm = () => {
     grid-gap: ${styles.space.l};
   `
 
-  const onSubmit = formInputs => {
+  const onSubmit = async formInputs => {
     const { title, story, categories } = formInputs
     const date = formInputs.date ? new Date(formInputs.date) : new Date()
 
     console.log('FOORM INPUT', formInputs)
 
     const data = {
+      userId,
       title,
       story,
       date,
@@ -155,7 +158,8 @@ const PostForm = () => {
       isPublic: false,
     }
 
-    addExperience(data)
+    const response = await addExperience(data)
+    console.log('form send response', response)
     // actions.addExperience(data)
   }
 
