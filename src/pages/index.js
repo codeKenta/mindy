@@ -1,7 +1,6 @@
 import React from 'react'
 import Layout from '../components/Layout/layout'
-import AuthRequired from '../Auth/AuthRequired'
-// import AuthRequired from '../FirebaseAuth/AuthRequired'
+import AuthRequired from '../Firebase/Auth/AuthRequired'
 
 import ExperiencesPage from '../components/ExperiencesPage/ExperiencesPage'
 const IndexPage = () => {

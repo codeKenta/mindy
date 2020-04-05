@@ -1,30 +1,20 @@
 import React from 'react'
-import * as firebase from 'firebase/app'
-import 'firebase/auth'
-import 'firebase/firestore'
+import firebase from '../firebase'
 
 import PropTypes from 'prop-types'
 import { useContext } from 'react'
-import { useAuthState } from 'react-firebase-hooks/auth'
-import { firebaseConfig } from './config'
 
 /*
 
 Firebase methods
 
 */
-let auth, provider, db
+let auth, provider
 if (typeof window !== 'undefined') {
-  firebase.initializeApp(firebaseConfig)
   auth = firebase.auth()
   auth.useDeviceLanguage()
   provider = new firebase.auth.GoogleAuthProvider()
-  // db = firebase.firestore
 }
-
-// export const firebase
-
-export { firebase }
 
 const signInWithGoogle = async () => {
   try {
@@ -116,9 +106,7 @@ export const useAuth = () => {
   }
 
   React.useEffect(() => {
-    // listen for auth state changes
     const unsubscribe = firebase.auth().onAuthStateChanged(onChange)
-    // unsubscribe to the listener when unmounting
     return () => unsubscribe()
   }, [])
 

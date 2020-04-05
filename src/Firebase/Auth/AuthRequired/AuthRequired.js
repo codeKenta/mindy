@@ -7,16 +7,6 @@ import { useSession } from '../Auth'
 const AuthRequired = ({ children }) => {
   const user = useSession()
 
-  // useEffect(() => {
-  //   if(!user) {
-  //     navigate('/', { replace: true });
-  //   }
-  // }, [user]);
-
-  useEffect(() => {
-    console.log('user in <AutheRequired/>', user)
-  }, [user])
-
   if (user) {
     return <>{children}</>
   } else return <Login />

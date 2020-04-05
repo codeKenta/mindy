@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
-import { useSession } from '../../Auth/Auth'
+import { useSession } from '../../Firebase/Auth/Auth'
 // import { useExperiences } from '../../hooks/useExperiences'
-import { addExperience } from '../../Auth/db'
+import { addExperience } from '../../Firebase/db'
 import styled from '@emotion/styled'
 import styles from '../../Styles'
 import Button from '../Elements/Button'
@@ -14,9 +14,11 @@ import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
 const PostForm = () => {
   const theme = useTheme()
-  const userId = useSession()
+  const user = useSession()
+
   // const { actions, statusNames, status, statusMessage } = useExperiences()
 
+  // console.log('UID postform', uid)
   const statusNames = {}
   const status = ''
   const statusMessage = ''
@@ -150,7 +152,7 @@ const PostForm = () => {
     console.log('FOORM INPUT', formInputs)
 
     const data = {
-      userId,
+      uid: user.uid,
       title,
       story,
       date,
@@ -160,7 +162,6 @@ const PostForm = () => {
 
     const response = await addExperience(data)
     console.log('form send response', response)
-    // actions.addExperience(data)
   }
 
   return (
