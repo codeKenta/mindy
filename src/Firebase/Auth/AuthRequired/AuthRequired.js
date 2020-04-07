@@ -1,11 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { useStitchAuth } from '../Auth/StitchAuth'
-import LoginComponent from '../Auth/LoginComponent'
+import { navigate } from 'gatsby'
+import Login from '../Login/Login'
+import { useSession } from '../Auth'
 
 const AuthRequired = ({ children }) => {
-  const { isLoggedIn } = useStitchAuth()
-  return <>{isLoggedIn ? children : <LoginComponent />}</>
+  const user = useSession()
+
+  if (user) {
+    return <>{children}</>
+  } else return <Login />
 }
 
 AuthRequired.propTypes = {
@@ -14,4 +18,5 @@ AuthRequired.propTypes = {
     PropTypes.node,
   ]).isRequired,
 }
+
 export default AuthRequired

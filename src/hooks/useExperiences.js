@@ -1,7 +1,6 @@
 import React, { useContext, useReducer } from 'react'
-import { experiences } from '../Auth/stitch'
-import { useStitchAuth } from '../Auth/StitchAuth'
-
+import { useSession } from '../Firebase/Auth/Auth'
+import db from '../Firebase/db'
 const ExperiencesContext = React.createContext(null)
 
 export const ExperiencesProvider = ({ children }) => {
@@ -11,34 +10,32 @@ export const ExperiencesProvider = ({ children }) => {
     statusMessage: null,
   })
 
-  const { isLoggedIn } = useStitchAuth()
+  const user = useSession()
 
   React.useEffect(() => {
-    const loadExperiences = async () => {
+    const getExperiences = async () => {
       dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
       try {
-        const loadedExperiences = await experiences
-          .find({}, { sort: { date: -1 } })
-          .asArray()
-
+        const experiences = await db.getExperiences(user.uid)
         dispatch({
-          type: actionTypes.loadExperiences,
-          payload: { loadedExperiences },
+          type: actionTypes.getExperiences,
+          payload: { experiences },
         })
       } catch (error) {
         dispatch({
           type: actionTypes.errorOccured,
           payload: {
-            message: 'Failed to load the storys',
+            message: 'Failed to load the stories',
           },
         })
         console.log('error add exp', error)
       }
     }
-    if (isLoggedIn) {
-      loadExperiences()
+
+    if (user) {
+      getExperiences()
     }
-  }, [isLoggedIn])
+  }, [user])
 
   return (
     <ExperiencesContext.Provider value={[state, dispatch]}>
@@ -51,19 +48,19 @@ const actionTypes = {
   pendingStart: 'pendingStart',
   errorOccured: 'errorOccured',
   addExperience: 'addExperience',
-  loadExperiences: 'loadExperiences',
+  getExperiences: 'getExperiences',
 }
 
 const statusNames = {
   error: 'error',
   pending: 'pending',
-  loadExperiencesSuccess: 'load-experiences-success',
+  getExperiencesSuccess: 'load-experiences-success',
   addExperienceSuccess: 'add-experiences-success',
 }
 
 export const useExperiences = () => {
   const [state, dispatch] = useContext(ExperiencesContext)
-  const { currentUser } = useStitchAuth()
+  const user = useSession()
 
   const pendingStart = () => {
     dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
@@ -80,12 +77,13 @@ export const useExperiences = () => {
 
   const addExperience = async experience => {
     pendingStart()
-    const newExperience = { ...experience, owner_id: currentUser.id }
+    const newExperience = { ...experience, uid: user.uid }
     try {
-      const result = await experiences.insertOne(newExperience)
+      const savedExperience = await db.addExperience(newExperience)
+
       dispatch({
         type: actionTypes.addExperience,
-        payload: { ...experience, _id: result.insertedId },
+        payload: { ...savedExperience },
       })
     } catch (error) {
       errorOccured('The story could not be saved')
@@ -122,11 +120,11 @@ const experiencesReducer = (state, { type, payload }) => {
       }
     }
 
-    case actionTypes.loadExperiences: {
+    case actionTypes.getExperiences: {
       return {
         ...state,
-        experiences: payload.loadedExperiences || [],
-        status: statusNames.loadExperiencesSuccess,
+        experiences: payload.experiences || [],
+        status: statusNames.getExperiencesSuccess,
       }
     }
 
