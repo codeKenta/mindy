@@ -15,23 +15,22 @@ export const ExperiencesProvider = ({ children }) => {
   React.useEffect(() => {
     const loadExperiences = async () => {
       dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
-      // try {
-      /* TODO: FETCH DOCUMENT WITH FIREBASE */
+      try {
+        const loadedExperiences = await db.getExperiences(user.uid)
 
-      const loadedExperiences = []
-      dispatch({
-        type: actionTypes.loadExperiences,
-        payload: { loadedExperiences },
-      })
-      // } catch (error) {
-      //   dispatch({
-      //     type: actionTypes.errorOccured,
-      //     payload: {
-      //       message: 'Failed to load the storys',
-      //     },
-      //   })
-      //   console.log('error add exp', error)
-      // }
+        dispatch({
+          type: actionTypes.loadExperiences,
+          payload: { loadedExperiences },
+        })
+      } catch (error) {
+        dispatch({
+          type: actionTypes.errorOccured,
+          payload: {
+            message: 'Failed to load the stories',
+          },
+        })
+        console.log('error add exp', error)
+      }
     }
     if (user) {
       loadExperiences()
@@ -81,6 +80,11 @@ export const useExperiences = () => {
     const newExperience = { ...experience, uid: user.uid }
     try {
       const result = await db.addExperience(newExperience)
+      // TODO: ADD RESULT TO STORE
+
+      console.log('ADD NEW EXP; RESULT', result)
+
+      console.log()
       dispatch({
         type: actionTypes.addExperience,
         payload: { ...experience },
@@ -148,3 +152,20 @@ const experiencesReducer = (state, { type, payload }) => {
     }
   }
 }
+
+/*
+The following example shows how to retrieve the contents of a single document using get():
+var docRef = db.collection("cities").doc("SF");
+
+docRef.get().then(function(doc) {
+    if (doc.exists) {
+        console.log("Document data:", doc.data());
+    } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+    }
+}).catch(function(error) {
+    console.log("Error getting document:", error);
+});
+
+*/

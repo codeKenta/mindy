@@ -1,15 +1,14 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Moment from 'react-moment'
-// import { useStitchAuth } from '../../Auth/StitchAuth'
-// import { useExperiences } from '../../hooks/useExperiences'
+import { useExperiences } from '../../hooks/useExperiences'
 import { useTheme } from 'emotion-theming'
 import Heading from '../Elements/Heading'
 import styled from '@emotion/styled'
 import styles from '../../Styles'
 
 const ExperiencesPage = () => {
-  // const { experiences } = useExperiences()
-  const [experiences, setExperiences] = useState([]) // <--- make hook to replace
+  const { experiences } = useExperiences()
+
   const theme = useTheme()
 
   const Section = styled.section``
@@ -65,7 +64,7 @@ const ExperiencesPage = () => {
       <Experience key={exp.date.toString()}>
         <Heading level={2}>{exp.title}</Heading>
         <Date>
-          <Moment format="dddd, MMMM Do YYYY">{exp.date}</Moment>
+          <Moment format="dddd, MMMM Do YYYY">{exp.date.seconds}</Moment>
         </Date>
         <Categories>{buildCategoriesString(exp.categories)}</Categories>
         <Story>{exp.story}</Story>
