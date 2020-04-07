@@ -31,6 +31,7 @@ export const ExperiencesProvider = ({ children }) => {
         console.log('error add exp', error)
       }
     }
+
     if (user) {
       getExperiences()
     }
@@ -78,16 +79,11 @@ export const useExperiences = () => {
     pendingStart()
     const newExperience = { ...experience, uid: user.uid }
     try {
-      const result = await db.addExperience(newExperience)
-      // TODO: ADD RESULT TO STORE
+      const savedExperience = await db.addExperience(newExperience)
 
-      console.log('ADD NEW EXP; RESULT', result)
-
-      console.log()
       dispatch({
         type: actionTypes.addExperience,
-        payload: { ...experience },
-        // payload: { ...experience, _id: result.insertedId },
+        payload: { ...savedExperience },
       })
     } catch (error) {
       errorOccured('The story could not be saved')
@@ -151,20 +147,3 @@ const experiencesReducer = (state, { type, payload }) => {
     }
   }
 }
-
-/*
-The following example shows how to retrieve the contents of a single document using get():
-var docRef = db.collection("cities").doc("SF");
-
-docRef.get().then(function(doc) {
-    if (doc.exists) {
-        console.log("Document data:", doc.data());
-    } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-    }
-}).catch(function(error) {
-    console.log("Error getting document:", error);
-});
-
-*/

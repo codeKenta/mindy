@@ -4,11 +4,19 @@ import firebase from '../firebase'
 // Fix envirement variables for now deploy
 
 export default {
-  addExperience: payload => {
-    return firebase
-      .firestore()
-      .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
-      .add(payload)
+  addExperience: async payload => {
+    try {
+      const docRef = await firebase
+        .firestore()
+        .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
+        .doc()
+
+      await docRef.set(payload)
+
+      return { ...payload, docId: docRef.id }
+    } catch (error) {
+      throw error
+    }
   },
   getExperiences: uid => {
     return firebase

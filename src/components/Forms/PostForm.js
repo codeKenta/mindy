@@ -146,10 +146,7 @@ const PostForm = () => {
       ? new Date(formInputs.date).toISOString()
       : new Date().toISOString()
 
-    console.log('FOORM INPUT', formInputs, date)
-
     const data = {
-      // uid: user.uid,
       title,
       story,
       date,
