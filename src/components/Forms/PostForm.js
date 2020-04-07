@@ -142,9 +142,11 @@ const PostForm = () => {
 
   const onSubmit = formInputs => {
     const { title, story, categories } = formInputs
-    const date = formInputs.date ? new Date(formInputs.date) : new Date()
+    const date = formInputs.date
+      ? new Date(formInputs.date).toISOString()
+      : new Date().toISOString()
 
-    console.log('FOORM INPUT', formInputs)
+    console.log('FOORM INPUT', formInputs, date)
 
     const data = {
       // uid: user.uid,

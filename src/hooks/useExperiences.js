@@ -13,14 +13,13 @@ export const ExperiencesProvider = ({ children }) => {
   const user = useSession()
 
   React.useEffect(() => {
-    const loadExperiences = async () => {
+    const getExperiences = async () => {
       dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
       try {
-        const loadedExperiences = await db.getExperiences(user.uid)
-
+        const experiences = await db.getExperiences(user.uid)
         dispatch({
-          type: actionTypes.loadExperiences,
-          payload: { loadedExperiences },
+          type: actionTypes.getExperiences,
+          payload: { experiences },
         })
       } catch (error) {
         dispatch({
@@ -33,7 +32,7 @@ export const ExperiencesProvider = ({ children }) => {
       }
     }
     if (user) {
-      loadExperiences()
+      getExperiences()
     }
   }, [user])
 
@@ -48,13 +47,13 @@ const actionTypes = {
   pendingStart: 'pendingStart',
   errorOccured: 'errorOccured',
   addExperience: 'addExperience',
-  loadExperiences: 'loadExperiences',
+  getExperiences: 'getExperiences',
 }
 
 const statusNames = {
   error: 'error',
   pending: 'pending',
-  loadExperiencesSuccess: 'load-experiences-success',
+  getExperiencesSuccess: 'load-experiences-success',
   addExperienceSuccess: 'add-experiences-success',
 }
 
@@ -125,11 +124,11 @@ const experiencesReducer = (state, { type, payload }) => {
       }
     }
 
-    case actionTypes.loadExperiences: {
+    case actionTypes.getExperiences: {
       return {
         ...state,
-        experiences: payload.loadedExperiences || [],
-        status: statusNames.loadExperiencesSuccess,
+        experiences: payload.experiences || [],
+        status: statusNames.getExperiencesSuccess,
       }
     }
 
