@@ -1,13 +1,9 @@
-import firebase from '../firebase'
-
-// TODO:
-// Fix envirement variables for now deploy
+import { db } from '../firebase'
 
 export default {
   addExperience: async payload => {
     try {
-      const docRef = await firebase
-        .firestore()
+      const docRef = await db
         .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
         .doc()
 
@@ -19,8 +15,7 @@ export default {
     }
   },
   getExperiences: uid => {
-    return firebase
-      .firestore()
+    return db
       .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
       .where('uid', '==', uid)
       .get()
