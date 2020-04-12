@@ -1,158 +1,106 @@
-import { storage, auth } from '../firebase'
-// const storageRef = storage.ref()
-
-import { useState, useEffect } from 'react'
 import firebase from 'firebase'
+import { storage, auth } from '../firebase'
+import { useState, useEffect } from 'react'
 
-const DOCUMENT_COLLECTION_NAME = 'image-file'
-const STORAGE_FILE_PATH = 'images/'
-
-function FirebaseFileUploadApi() {
+const useStorage = () => {
   const [data, setData] = useState()
   const [fileData, setFileData] = useState()
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
   const [progress, setProgress] = useState(null)
+  const [resultUrls, setResultUrls] = useState([])
 
   const clearData = () => {
     setData(null)
   }
 
-  /**
-   *
-   */
-  const generateFromImage = (
-    img,
-    MAX_WIDTH = 300,
-    MAX_HEIGHT = 300,
-    quality = 1
-  ) => {
-    return new Promise((resolve, reject) => {
-      var canvas = document.createElement('canvas')
-      var image = new Image()
-
-      image.onerror = error => {
-        reject(error)
-      }
-
-      image.onload = () => {
-        var width = image.width
-        var height = image.height
-
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width
-            width = MAX_WIDTH
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height
-            height = MAX_HEIGHT
-          }
-        }
-        canvas.width = width
-        canvas.height = height
-        var ctx = canvas.getContext('2d')
-
-        ctx.drawImage(image, 0, 0, width, height)
-
-        // IMPORTANT: 'jpeg' NOT 'jpg'
-        var dataUrl = canvas.toDataURL('image/jpeg', quality)
-
-        resolve(dataUrl)
-      }
-      image.src = img
-    })
-  }
-
   useEffect(() => {
-    const storageRef = storage.ref()
-    const uploadData = async () => {
-      // initialize upload information
-      setIsError(false)
-      setIsLoading(true)
+    const initUploadToFirestore = () => {
+      const storageRef = storage.ref()
 
-      setProgress({ value: 0 })
-      // ensure unique file names
-      let uniquePathName =
-        new Date().getTime() +
-        '-' +
-        auth.currentUser.uid +
-        '-' +
-        fileData.fileName
-
-      try {
-        let ref = storageRef.child(STORAGE_FILE_PATH + uniquePathName)
-        let uploadTask = ref.putString(fileData.dataUrl, 'data_url', {
-          contentType: 'image/' + fileData.format,
-        })
-
-        // The first example.
-        uploadTask.on(
-          // firebase.storage.TaskEvent.STATE_CHANGED,
-          storage.TaskEvent.STATE_CHANGED,
-          _progress => {
-            var value = _progress.bytesTransferred / _progress.totalBytes
-            setProgress({ value })
-          },
-          _error => {
-            setIsLoading(false)
-            setIsError(_error)
-          },
-          async _complete => {
-            setIsError(false)
-            setIsLoading(false)
-
-            let downloadUrl = await uploadTask.snapshot.ref.getDownloadURL()
-            let storageData = {
-              //   metaData: uploadTask.snapshot.metadata,
-              downloadUrl,
-              name: uploadTask.snapshot.metadata.name,
-              image: {
-                ref: uploadTask.snapshot.ref.fullPath,
-                size: uploadTask.snapshot.metadata.size,
-                contentType: uploadTask.snapshot.metadata.contentType,
-                timeCreated: uploadTask.snapshot.metadata.timeCreated,
-              },
-            }
-
-            // save to collection
-            let docSaved = await onSave(storageData)
-
-            // get document
-            let docData = await docSaved.get()
-            setData({
-              ...docData.data(),
-              id: docData.id,
-            })
-
-            setProgress(null)
-          }
-        )
-      } catch (_error) {
-        setIsLoading(false)
-        setIsError(_error)
+      // Create the file metadata
+      var metadata = {
+        contentType: fileData.type,
       }
+
+      // Upload file and metadata to the object 'images/mountains.jpg'
+      var uploadTask = storageRef
+        .child('images/' + fileData.name)
+        .put(fileData, metadata)
+
+      // Listen for state changes, errors, and completion of the upload.
+      uploadTask.on(
+        firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+        function(snapshot) {
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          setProgress(progress)
+          console.log('Upload is ' + progress + '% done')
+          switch (snapshot.state) {
+            case firebase.storage.TaskState.PAUSED: // or 'paused'
+              console.log('Upload is paused')
+              if (isLoading) {
+                setIsLoading(false)
+              }
+              break
+            case firebase.storage.TaskState.RUNNING: // or 'running'
+              console.log('Upload is running')
+              if (!isLoading) {
+                setIsLoading(true)
+              }
+              break
+          }
+        },
+        function(error) {
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          setIsError(error)
+          switch (error.code) {
+            case 'storage/unauthorized':
+              // User doesn't have permission to access the object
+              break
+
+            case 'storage/canceled':
+              // User canceled the upload
+              break
+
+            case 'storage/unknown':
+              // Unknown error occurred, inspect error.serverResponse
+              break
+          }
+        },
+        function() {
+          // Upload completed successfully, now we can get the download URL
+
+          setIsLoading(true)
+          uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+            setResultUrls(resultUrls.push(downloadURL))
+            console.log('File available at', downloadURL)
+          })
+        }
+      )
     }
 
-    fileData && uploadData()
+    fileData && initUploadToFirestore()
   }, [fileData])
 
-  /**
-   *
-   * @param {*} _data
-   */
-  const onSave = async _data => {
-    let thumb = await generateFromImage(fileData.dataUrl)
-    let collectionRef = storage.collection(DOCUMENT_COLLECTION_NAME)
-    return await collectionRef.add({
-      ..._data,
-      thumb,
-      createdOn: storage.FieldValue.serverTimestamp(),
-    })
+  // TODO:
+  // Make funktion to upload array of files,
+  // return a promise so we can use it before add the story to db with the uploaded inages firebase-url
+
+  const uploadFiles = async files => {
+    if (files.length > 0) {
+      for (const file of files) {
+        // const contents = await fs.readFile(file, 'utf8')
+        /*
+        
+        */
+        // console.log(contents)
+      }
+    }
   }
 
   return [{ data, isLoading, isError, progress }, setFileData, clearData]
 }
 
-export default FirebaseFileUploadApi
+export default useStorage

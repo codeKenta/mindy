@@ -11,11 +11,17 @@ import DateInput from './DateInput/DateInput'
 // import Editor from './Editor/Editor'
 import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
+import useStorage from '../../Firebase/storage'
+
 const PostForm = () => {
   const theme = useTheme()
-  const user = useSession()
 
   const { actions, statusNames, status, statusMessage } = useExperiences()
+  const [
+    { data, isLoading, isError, progress },
+    setFileData,
+    clearData,
+  ] = useStorage({ i: {} })
 
   const [images, setImages] = useState([])
 
@@ -142,6 +148,14 @@ const PostForm = () => {
 
   const onSubmit = formInputs => {
     const { title, story, categories } = formInputs
+
+    if (images.length > 0) {
+      console.log('this is a image', images[0])
+      setFileData(images[0])
+
+      console.log({ data, isLoading, isError, progress })
+    }
+
     const date = formInputs.date
       ? new Date(formInputs.date).toISOString()
       : new Date().toISOString()
@@ -154,7 +168,7 @@ const PostForm = () => {
       isPublic: false,
     }
 
-    actions.addExperience(data)
+    // actions.addExperience(data)
   }
 
   return (
@@ -176,7 +190,7 @@ const PostForm = () => {
                   name="title"
                   component="input"
                   className="input text"
-                  required
+                  // required
                 />
               </FormGroup>
             )}
