@@ -9,7 +9,7 @@ Firebase method
 
 const signInWithGoogle = async () => {
   try {
-    await auth.signInWithPopup(provider)
+    await auth.signInWithRedirect(provider)
   } catch (err) {
     console.error(err)
     throw err

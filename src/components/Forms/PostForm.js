@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
-import { useSession } from '../../Firebase/Auth/Auth'
 import { useExperiences } from '../../hooks/useExperiences'
 import styled from '@emotion/styled'
 import styles from '../../Styles'
@@ -11,17 +10,22 @@ import DateInput from './DateInput/DateInput'
 // import Editor from './Editor/Editor'
 import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
-import useStorage from '../../Firebase/storage'
+import useStorage from '../../Firebase/Storage'
 
 const PostForm = () => {
   const theme = useTheme()
 
   const { actions, statusNames, status, statusMessage } = useExperiences()
   const [
-    { data, isLoading, isError, progress },
-    setFileData,
-    clearData,
-  ] = useStorage({ i: {} })
+    {
+      isLoading: uploadIsLoading,
+      isError: uploadError,
+      progress: uploadProgress,
+      resultUrls: uploadResultUrls,
+    },
+    uploadFiles,
+  ] = useStorage()
+  // const [{ isLoading, isError, progress }, uploadFiles] = useStorage({ i: {} })
 
   const [images, setImages] = useState([])
 
@@ -146,14 +150,20 @@ const PostForm = () => {
     grid-gap: ${styles.space.l};
   `
 
-  const onSubmit = formInputs => {
+  const onSubmit = async formInputs => {
     const { title, story, categories } = formInputs
 
     if (images.length > 0) {
-      console.log('this is a image', images[0])
-      setFileData(images[0])
+      // console.log('this is a image', images[0])
+      // setFileData(images[0])
 
-      console.log({ data, isLoading, isError, progress })
+      const urls = await uploadFiles(images)
+      if (!uploadError && urls.length < 0) {
+        console.log('if (!uploadError && uploadResultUrls) ')
+        console.log('REsult form uploadFiles in postform', urls)
+      } else {
+        console.log('Did not make the upload')
+      }
     }
 
     const date = formInputs.date
