@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
-import { useSession } from '../../Firebase/Auth/Auth'
 import { useExperiences } from '../../hooks/useExperiences'
 import styled from '@emotion/styled'
 import styles from '../../Styles'
@@ -11,11 +10,20 @@ import DateInput from './DateInput/DateInput'
 // import Editor from './Editor/Editor'
 import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
+import useStorage from '../../Firebase/Storage'
+
 const PostForm = () => {
   const theme = useTheme()
-  const user = useSession()
 
   const { actions, statusNames, status, statusMessage } = useExperiences()
+  const [
+    {
+      // isLoading: uploadIsLoading,
+      isError: uploadError,
+      // progress: uploadProgress,
+    },
+    uploadFiles,
+  ] = useStorage()
 
   const [images, setImages] = useState([])
 
@@ -140,21 +148,36 @@ const PostForm = () => {
     grid-gap: ${styles.space.l};
   `
 
-  const onSubmit = formInputs => {
+  const resetForm = () => {
+    // TODO: RESET FORM
+    setImages([])
+  }
+  const onSubmit = async formInputs => {
     const { title, story, categories } = formInputs
-    const date = formInputs.date
-      ? new Date(formInputs.date).toISOString()
-      : new Date().toISOString()
 
-    const data = {
-      title,
-      story,
-      date,
-      categories: categories || [],
-      isPublic: false,
+    if (images.length > 0) {
+      // console.log('this is a image', images[0])
+      // setFileData(images[0])
+
+      const storedImagesUrl = await uploadFiles(images)
+
+      if (!uploadError && storedImagesUrl.length > 0) {
+        const date = formInputs.date
+          ? new Date(formInputs.date).toISOString()
+          : new Date().toISOString()
+
+        const data = {
+          title,
+          story,
+          date,
+          images: storedImagesUrl,
+          categories: categories || [],
+          isPublic: false,
+        }
+
+        actions.addExperience(data)
+      }
     }
-
-    actions.addExperience(data)
   }
 
   return (
@@ -176,7 +199,7 @@ const PostForm = () => {
                   name="title"
                   component="input"
                   className="input text"
-                  required
+                  // required
                 />
               </FormGroup>
             )}

@@ -1,24 +1,15 @@
 import React from 'react'
-import firebase from '../firebase'
-
+import { auth, provider } from '../firebase'
 import PropTypes from 'prop-types'
 import { useContext } from 'react'
 
 /*
-
-Firebase methods
-
+Firebase method
 */
-let auth, provider
-if (typeof window !== 'undefined') {
-  auth = firebase.auth()
-  auth.useDeviceLanguage()
-  provider = new firebase.auth.GoogleAuthProvider()
-}
 
 const signInWithGoogle = async () => {
   try {
-    await auth.signInWithPopup(provider)
+    await auth.signInWithRedirect(provider)
   } catch (err) {
     console.error(err)
     throw err
@@ -55,9 +46,7 @@ const signInAnonymously = async () => {
 const signOut = () => auth.signOut()
 
 /*
-
 Hooks and context
-
 */
 
 const userContext = React.createContext({
@@ -96,7 +85,7 @@ export const useAuth = () => {
   const [state, setState] = React.useState(() => {
     let user
     if (typeof window !== 'undefined') {
-      user = firebase.auth().currentUser
+      user = auth.currentUser
     }
     return { initializing: !user, user }
   })
@@ -106,7 +95,7 @@ export const useAuth = () => {
   }
 
   React.useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(onChange)
+    const unsubscribe = auth.onAuthStateChanged(onChange)
     return () => unsubscribe()
   }, [])
 
