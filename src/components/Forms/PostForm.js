@@ -18,14 +18,12 @@ const PostForm = () => {
   const { actions, statusNames, status, statusMessage } = useExperiences()
   const [
     {
-      isLoading: uploadIsLoading,
+      // isLoading: uploadIsLoading,
       isError: uploadError,
-      progress: uploadProgress,
-      resultUrls: uploadResultUrls,
+      // progress: uploadProgress,
     },
     uploadFiles,
   ] = useStorage()
-  // const [{ isLoading, isError, progress }, uploadFiles] = useStorage({ i: {} })
 
   const [images, setImages] = useState([])
 
@@ -150,6 +148,10 @@ const PostForm = () => {
     grid-gap: ${styles.space.l};
   `
 
+  const resetForm = () => {
+    // TODO: RESET FORM
+    setImages([])
+  }
   const onSubmit = async formInputs => {
     const { title, story, categories } = formInputs
 
@@ -157,28 +159,25 @@ const PostForm = () => {
       // console.log('this is a image', images[0])
       // setFileData(images[0])
 
-      const urls = await uploadFiles(images)
-      if (!uploadError && urls.length < 0) {
-        console.log('if (!uploadError && uploadResultUrls) ')
-        console.log('REsult form uploadFiles in postform', urls)
-      } else {
-        console.log('Did not make the upload')
+      const storedImagesUrl = await uploadFiles(images)
+
+      if (!uploadError && storedImagesUrl.length > 0) {
+        const date = formInputs.date
+          ? new Date(formInputs.date).toISOString()
+          : new Date().toISOString()
+
+        const data = {
+          title,
+          story,
+          date,
+          images: storedImagesUrl,
+          categories: categories || [],
+          isPublic: false,
+        }
+
+        actions.addExperience(data)
       }
     }
-
-    const date = formInputs.date
-      ? new Date(formInputs.date).toISOString()
-      : new Date().toISOString()
-
-    const data = {
-      title,
-      story,
-      date,
-      categories: categories || [],
-      isPublic: false,
-    }
-
-    // actions.addExperience(data)
   }
 
   return (
