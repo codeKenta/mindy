@@ -148,35 +148,34 @@ const PostForm = () => {
     grid-gap: ${styles.space.l};
   `
 
-  const resetForm = () => {
-    // TODO: RESET FORM
-    setImages([])
-  }
+  // const resetForm = () => {
+  //   // TODO: RESET FORM
+  //   setImages([])
+  // }
   const onSubmit = async formInputs => {
     const { title, story, categories } = formInputs
+    const date = formInputs.date
+      ? new Date(formInputs.date).toISOString()
+      : new Date().toISOString()
+
+    const data = {
+      title,
+      story,
+      date,
+      images: [],
+      categories: categories || [],
+      isPublic: false,
+    }
 
     if (images.length > 0) {
-      // console.log('this is a image', images[0])
-      // setFileData(images[0])
+      const storedImagesUrls = await uploadFiles(images)
 
-      const storedImagesUrl = await uploadFiles(images)
-
-      if (!uploadError && storedImagesUrl.length > 0) {
-        const date = formInputs.date
-          ? new Date(formInputs.date).toISOString()
-          : new Date().toISOString()
-
-        const data = {
-          title,
-          story,
-          date,
-          images: storedImagesUrl,
-          categories: categories || [],
-          isPublic: false,
-        }
-
-        actions.addExperience(data)
+      if (!uploadError && storedImagesUrls.length > 0) {
+        const dataWithImages = { ...data, images: storedImagesUrls }
+        actions.addExperience(dataWithImages)
       }
+    } else {
+      actions.addExperience(data)
     }
   }
 
