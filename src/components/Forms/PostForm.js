@@ -7,10 +7,21 @@ import styles from '../../Styles'
 import Button from '../Elements/Button'
 import CheckIcon from '../Icons/check'
 import DateInput from './DateInput/DateInput'
-// import Editor from './Editor/Editor'
+import Editor from './Editor/Editor'
 import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
 import useStorage from '../../Firebase/storage'
+
+// Just trying my best
+import { stateToHTML } from 'draft-js-export-html'
+import { convertFromRaw } from 'draft-js'
+
+const convertCommentFromJSONToHTML = text => {
+  if (text) {
+    return stateToHTML(convertFromRaw(text))
+  }
+  // return stateToHTML(convertFromRaw(JSON.parse(text)))
+}
 
 const PostForm = () => {
   const theme = useTheme()
@@ -26,6 +37,7 @@ const PostForm = () => {
   ] = useStorage()
 
   const [images, setImages] = useState([])
+  const [rawText, setRawText] = useState()
 
   const Label = styled.label`
     display: block;
@@ -153,6 +165,7 @@ const PostForm = () => {
   //   setImages([])
   // }
   const onSubmit = async formInputs => {
+    console.log('formInputs', formInputs)
     const { title, story, categories } = formInputs
     const date = formInputs.date
       ? new Date(formInputs.date).toISOString()
@@ -175,7 +188,8 @@ const PostForm = () => {
         actions.addExperience(dataWithImages)
       }
     } else {
-      actions.addExperience(data)
+      console.log('Here trigger "addExperience"')
+      // actions.addExperience(data)
     }
   }
 
@@ -214,10 +228,23 @@ const PostForm = () => {
             />
           </FormGroup>
 
-          {/* <FormGroup className="story">
+          <p> editor:</p>
+          <FormGroup className="story">
             <Label htmlFor="story">Story</Label>
-            <Field name="story-editor" component={Editor} />
-          </FormGroup> */}
+            <Field
+              name="story-editor"
+              handleRawState={setRawText}
+              component={Editor}
+            />
+          </FormGroup>
+
+          <div id="comment-div">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: convertCommentFromJSONToHTML(rawText),
+              }}
+            ></div>
+          </div>
 
           <FormGroup className="date">
             <Label htmlFor="date">Date</Label>

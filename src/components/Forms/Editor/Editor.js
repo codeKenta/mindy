@@ -1,11 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { Editor } from 'react-draft-wysiwyg'
-import { EditorState } from 'draft-js'
+import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
-const TextEditor = () => {
+const TextEditor = ({ handleRawState }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
+
+  // useEffect(() => {
+  //   const raw = convertToRaw(editorState.getCurrentContent())
+  //   handleRawState(raw)
+  // }, [editorState])
+
   const onEditorStateChange = editorState => {
+    // const raw = convertToRaw(editorState.getCurrentContent())
+
+    // handleRawState(raw)
+
     return setEditorState(editorState)
   }
 
@@ -19,6 +30,10 @@ const TextEditor = () => {
       />
     </div>
   )
+}
+
+TextEditor.propTypes = {
+  handleChange: PropTypes.func,
 }
 
 export default TextEditor
