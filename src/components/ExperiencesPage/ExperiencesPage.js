@@ -60,11 +60,12 @@ const ExperiencesPage = () => {
   }
 
   const renderExperiences = experiences.map(exp => {
+    console.log('date', exp.date)
     return (
       <Experience key={exp.date.toString()}>
         <Heading level={2}>{exp.title}</Heading>
         <Date>
-          <Moment format="dddd, MMMM Do YYYY">{exp.date.seconds}</Moment>
+          <Moment format="dddd, MMMM Do YYYY">{exp.date}</Moment>
         </Date>
         <Categories>{buildCategoriesString(exp.categories)}</Categories>
         <Story>{exp.story}</Story>
