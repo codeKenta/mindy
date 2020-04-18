@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useExperiences } from '../../hooks/useExperiences'
@@ -7,21 +7,25 @@ import styles from '../../Styles'
 import Button from '../Elements/Button'
 import CheckIcon from '../Icons/check'
 import DateInput from './DateInput/DateInput'
-import Editor from './Editor/Editor'
+// import Editor from './Editor/Editor'
+import { Editor } from 'react-draft-wysiwyg'
+import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
 import useStorage from '../../Firebase/storage'
 
 // Just trying my best
 import { stateToHTML } from 'draft-js-export-html'
-import { convertFromRaw } from 'draft-js'
+// import { convertFromRaw } from 'draft-js'
+import draftToHtml from 'draftjs-to-html'
 
-const convertCommentFromJSONToHTML = text => {
-  if (text) {
-    return stateToHTML(convertFromRaw(text))
-  }
-  // return stateToHTML(convertFromRaw(JSON.parse(text)))
-}
+// const convertCommentFromJSONToHTML = text => {
+//   if (text) {
+//     return stateToHTML(convertFromRaw(text))
+//   }
+//   // return stateToHTML(convertFromRaw(JSON.parse(text)))
+// }
 
 const PostForm = () => {
   const theme = useTheme()
@@ -37,7 +41,23 @@ const PostForm = () => {
   ] = useStorage()
 
   const [images, setImages] = useState([])
-  const [rawText, setRawText] = useState()
+  // const [rawText, setRawText] = useState()
+
+  const [editorState, setEditorState] = useState(EditorState.createEmpty())
+
+  const onEditorStateChange = editorState => {
+    return setEditorState(editorState)
+  }
+
+  useEffect(() => {
+    const raw = convertToRaw(editorState.getCurrentContent())
+    const html = draftToHtml(raw)
+    const json = JSON.stringify(raw)
+
+    console.log('POSTFORM RAWTEXT EFFECT', html)
+    console.log('JSON stringify', json, JSON.stringify(html))
+    console.log('JSON jsonParse', JSON.parse(json))
+  }, [editorState])
 
   const Label = styled.label`
     display: block;
@@ -229,22 +249,39 @@ const PostForm = () => {
           </FormGroup>
 
           <p> editor:</p>
-          <FormGroup className="story">
+          {/* <FormGroup className="story">
             <Label htmlFor="story">Story</Label>
             <Field
               name="story-editor"
               handleRawState={setRawText}
               component={Editor}
             />
+          </FormGroup> */}
+
+          <FormGroup className="story">
+            <Label htmlFor="story">Story</Label>
+            <Field
+              name="story-editor"
+              render={({ input }) => (
+                <Editor
+                  editorState={editorState}
+                  wrapperClassName="demo-wrapper"
+                  editorClassName="demo-editor"
+                  onEditorStateChange={onEditorStateChange}
+                />
+              )}
+            />
           </FormGroup>
 
-          <div id="comment-div">
+          {/* <div id="comment-div">
             <div
               dangerouslySetInnerHTML={{
                 __html: convertCommentFromJSONToHTML(rawText),
               }}
             ></div>
-          </div>
+          </div> */}
+
+          {/* <div>{draftToHtml(rawText)}</div> */}
 
           <FormGroup className="date">
             <Label htmlFor="date">Date</Label>

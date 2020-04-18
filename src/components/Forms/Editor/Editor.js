@@ -5,18 +5,13 @@ import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
 const TextEditor = ({ handleRawState }) => {
-  const [editorState, setEditorState] = useState(EditorState.createEmpty())
-
   // useEffect(() => {
   //   const raw = convertToRaw(editorState.getCurrentContent())
   //   handleRawState(raw)
   // }, [editorState])
+  const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
   const onEditorStateChange = editorState => {
-    // const raw = convertToRaw(editorState.getCurrentContent())
-
-    // handleRawState(raw)
-
     return setEditorState(editorState)
   }
 
