@@ -1,6 +1,6 @@
-import firebase from './node_modules/firebase'
+import firebase from 'firebase'
 import { storage } from '../firebase'
-import { useState } from './node_modules/react'
+import { useState } from 'react'
 
 const useStorage = () => {
   const [isLoading, setIsLoading] = useState(false)
