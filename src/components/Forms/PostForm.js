@@ -10,7 +10,7 @@ import DateInput from './DateInput/DateInput'
 // import Editor from './Editor/Editor'
 import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
-import useStorage from '../../Firebase/Storage'
+import useStorage from '../../Firebase/storage'
 
 const PostForm = () => {
   const theme = useTheme()
