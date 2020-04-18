@@ -1,6 +1,11 @@
-import firebase from 'firebase'
+// import firebase from 'firebase'
 import { storage } from '../firebase'
 import { useState } from 'react'
+let firebase
+
+if (typeof window !== 'undefined') {
+  firebase = require('firebase')
+}
 
 const useStorage = () => {
   const [isLoading, setIsLoading] = useState(false)
