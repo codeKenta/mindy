@@ -7,18 +7,17 @@ import styles from '../../Styles'
 import Button from '../Elements/Button'
 import CheckIcon from '../Icons/check'
 import DateInput from './DateInput/DateInput'
-// import Editor from './Editor/Editor'
 import { Editor } from 'react-draft-wysiwyg'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import draftToHtml from 'draftjs-to-html'
 import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
 import useStorage from '../../Firebase/storage'
+import { stripHtml } from '../../helpers'
 
 // Just trying my best
-import { stateToHTML } from 'draft-js-export-html'
-// import { convertFromRaw } from 'draft-js'
-import draftToHtml from 'draftjs-to-html'
+// import { stateToHTML } from 'draft-js-export-html'
 
 // const convertCommentFromJSONToHTML = text => {
 //   if (text) {
@@ -47,6 +46,47 @@ const PostForm = () => {
 
   const onEditorStateChange = editorState => {
     return setEditorState(editorState)
+  }
+
+  // const resetForm = () => {
+  //   // TODO: RESET FORM
+  //   setImages([])
+  // }
+
+  const onSubmit = async formInputs => {
+    console.log('formInputs', formInputs)
+    const { title, categories } = formInputs
+    const date = formInputs.date
+      ? new Date(formInputs.date).toISOString()
+      : new Date().toISOString()
+
+    const storyRaw = convertToRaw(editorState.getCurrentContent())
+    const storyHTML = draftToHtml(storyRaw)
+
+    const data = {
+      title,
+      date,
+      story: {
+        raw: JSON.stringify(storyRaw),
+        html: JSON.stringify(storyHTML),
+        text: stripHtml(storyHTML),
+      },
+      images: [],
+      categories: categories || [],
+      isPublic: false,
+    }
+
+    if (images.length > 0) {
+      const storedImagesUrls = await uploadFiles(images)
+
+      if (!uploadError && storedImagesUrls.length > 0) {
+        const dataWithImages = { ...data, images: storedImagesUrls }
+        actions.addExperience(dataWithImages)
+      }
+    } else {
+      console.log('Here trigger "addExperience"')
+      // actions.addExperience(data)
+    }
   }
 
   useEffect(() => {
@@ -180,39 +220,6 @@ const PostForm = () => {
     grid-gap: ${styles.space.l};
   `
 
-  // const resetForm = () => {
-  //   // TODO: RESET FORM
-  //   setImages([])
-  // }
-  const onSubmit = async formInputs => {
-    console.log('formInputs', formInputs)
-    const { title, story, categories } = formInputs
-    const date = formInputs.date
-      ? new Date(formInputs.date).toISOString()
-      : new Date().toISOString()
-
-    const data = {
-      title,
-      story,
-      date,
-      images: [],
-      categories: categories || [],
-      isPublic: false,
-    }
-
-    if (images.length > 0) {
-      const storedImagesUrls = await uploadFiles(images)
-
-      if (!uploadError && storedImagesUrls.length > 0) {
-        const dataWithImages = { ...data, images: storedImagesUrls }
-        actions.addExperience(dataWithImages)
-      }
-    } else {
-      console.log('Here trigger "addExperience"')
-      // actions.addExperience(data)
-    }
-  }
-
   return (
     <Form
       onSubmit={onSubmit}
@@ -268,6 +275,28 @@ const PostForm = () => {
                   wrapperClassName="demo-wrapper"
                   editorClassName="demo-editor"
                   onEditorStateChange={onEditorStateChange}
+                  toolbar={{
+                    options: ['inline', 'blockType', 'list', 'history'],
+                    inline: {
+                      inDropdown: false,
+                      className: 'story-inline',
+                      options: ['bold', 'italic'],
+                      bold: { className: 'story-inline--bold' },
+                      italic: { className: 'story-inline--italic' },
+                    },
+                    blockType: {
+                      inDropdown: true,
+                      options: ['Normal', 'H2', 'H3'],
+                      className: 'story-block_type',
+                    },
+                    list: {
+                      inDropdown: false,
+                      className: 'story-list',
+                      options: ['unordered', 'ordered'],
+                      unordered: { className: 'story-list-ul' },
+                      ordered: { className: 'story-list-ol' },
+                    },
+                  }}
                 />
               )}
             />
