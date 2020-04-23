@@ -81,6 +81,8 @@ export const useExperiences = () => {
     try {
       const savedExperience = await db.addExperience(newExperience)
 
+      localStorage.removeItem(user.uid)
+
       dispatch({
         type: actionTypes.addExperience,
         payload: { ...savedExperience },

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useExperiences } from '../../hooks/useExperiences'
+import { useSession } from '../../Firebase/Auth/Auth'
 import styled from '@emotion/styled'
 import styles from '../../Styles'
 import Button from '../Elements/Button'
@@ -9,12 +10,17 @@ import CheckIcon from '../Icons/check'
 import DateInput from './DateInput/DateInput'
 import { Editor } from 'react-draft-wysiwyg'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import '../../Styles/react-draft-wysiwyg.css'
 import draftToHtml from 'draftjs-to-html'
 import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
 import useStorage from '../../Firebase/storage'
 import { stripHtml } from '../../helpers'
+
+/* 
+editor alternative
+SLATE https://www.npmjs.com/package/slate 
+*/
 
 // Just trying my best
 // import { stateToHTML } from 'draft-js-export-html'
@@ -29,6 +35,8 @@ import { stripHtml } from '../../helpers'
 const PostForm = () => {
   const theme = useTheme()
 
+  const { uid: userId } = useSession()
+
   const { actions, statusNames, status, statusMessage } = useExperiences()
   const [
     {
@@ -40,13 +48,36 @@ const PostForm = () => {
   ] = useStorage()
 
   const [images, setImages] = useState([])
-  // const [rawText, setRawText] = useState()
+  const [countInputs, setCountInputs] = useState(0)
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
   const onEditorStateChange = editorState => {
+    saveDraftToLocalStorage()
     return setEditorState(editorState)
   }
+
+  const saveDraftToLocalStorage = () => {
+    console.log('saveDraft')
+
+    setCountInputs(countInputs + 1)
+
+    if (countInputs > 10) {
+      console.log('lets save')
+      setCountInputs(0)
+
+      const draftText = convertToRaw(editorState.getCurrentContent())
+      localStorage[userId] = JSON.stringify(draftText)
+    }
+  }
+
+  // init component, prefill with data if there is a edit or any draft in local storage
+  useEffect(() => {
+    if (localStorage[userId]) {
+      const draft = JSON.parse(localStorage[userId])
+      setEditorState(EditorState.createWithContent(convertFromRaw(draft)))
+    }
+  }, [])
 
   // const resetForm = () => {
   //   // TODO: RESET FORM
@@ -85,19 +116,16 @@ const PostForm = () => {
       }
     } else {
       console.log('Here trigger "addExperience"')
-      // actions.addExperience(data)
+
+      actions.addExperience(data)
     }
   }
 
-  useEffect(() => {
-    const raw = convertToRaw(editorState.getCurrentContent())
-    const html = draftToHtml(raw)
-    const json = JSON.stringify(raw)
-
-    console.log('POSTFORM RAWTEXT EFFECT', html)
-    console.log('JSON stringify', json, JSON.stringify(html))
-    console.log('JSON jsonParse', JSON.parse(json))
-  }, [editorState])
+  // useEffect(() => {
+  //   const raw = convertToRaw(editorState.getCurrentContent())
+  //   const html = draftToHtml(raw)
+  //   const json = JSON.stringify(raw)
+  // }, [editorState])
 
   const Label = styled.label`
     display: block;
@@ -248,26 +276,6 @@ const PostForm = () => {
           <FormGroup className="story">
             <Label htmlFor="story">Story</Label>
             <Field
-              name="story"
-              render={({ input }) => (
-                <textarea {...input} className="input text" />
-              )}
-            />
-          </FormGroup>
-
-          <p> editor:</p>
-          {/* <FormGroup className="story">
-            <Label htmlFor="story">Story</Label>
-            <Field
-              name="story-editor"
-              handleRawState={setRawText}
-              component={Editor}
-            />
-          </FormGroup> */}
-
-          <FormGroup className="story">
-            <Label htmlFor="story">Story</Label>
-            <Field
               name="story-editor"
               render={({ input }) => (
                 <Editor
@@ -301,16 +309,6 @@ const PostForm = () => {
               )}
             />
           </FormGroup>
-
-          {/* <div id="comment-div">
-            <div
-              dangerouslySetInnerHTML={{
-                __html: convertCommentFromJSONToHTML(rawText),
-              }}
-            ></div>
-          </div> */}
-
-          {/* <div>{draftToHtml(rawText)}</div> */}
 
           <FormGroup className="date">
             <Label htmlFor="date">Date</Label>
