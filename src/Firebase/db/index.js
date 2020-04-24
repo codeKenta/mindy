@@ -18,6 +18,7 @@ export default {
     return db
       .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
       .where('uid', '==', uid)
+      .orderBy('date', 'desc')
       .get()
       .then(querySnapshot => {
         const data = querySnapshot.docs.map(doc => {
@@ -30,3 +31,10 @@ export default {
       })
   },
 }
+
+// let query = firestore.collection('col').where('foo', '>', 42);
+
+// query.orderBy('foo', 'desc').get().then(querySnapshot => {
+//   querySnapshot.forEach(documentSnapshot => {
+//     console.log(`Found document at ${documentSnapshot.ref.path}`);
+//   });

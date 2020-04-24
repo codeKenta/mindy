@@ -4,6 +4,7 @@ import { useExperiences } from '../../hooks/useExperiences'
 import { useTheme } from 'emotion-theming'
 import Heading from '../Elements/Heading'
 import styled from '@emotion/styled'
+import ReactMarkdown from 'react-markdown'
 import styles from '../../Styles'
 
 const ExperiencesPage = () => {
@@ -60,7 +61,14 @@ const ExperiencesPage = () => {
   }
 
   const renderExperiences = experiences.map(exp => {
-    console.log('date', exp.date)
+    const storyPureText = typeof exp.story === 'string' ? exp.story : null
+
+    const storyTextAsMarkdown =
+      !storyPureText && exp.story && exp.story.markdown
+        ? JSON.parse(exp.story.markdown)
+        : null
+
+    // console.log('the exp', exp)
     return (
       <Experience key={exp.date.toString()}>
         <Heading level={2}>{exp.title}</Heading>
@@ -68,7 +76,8 @@ const ExperiencesPage = () => {
           <Moment format="dddd, MMMM Do YYYY">{exp.date}</Moment>
         </Date>
         <Categories>{buildCategoriesString(exp.categories)}</Categories>
-        <Story>{exp.story}</Story>
+        <Story>{storyPureText}</Story>
+        {!storyPureText && <ReactMarkdown source={storyTextAsMarkdown} />}
       </Experience>
     )
   })
