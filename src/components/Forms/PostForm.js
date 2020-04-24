@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
-import { useExperiences } from '../../hooks/useExperiences'
 import { useSession } from '../../Firebase/Auth/Auth'
+import useStorage from '../../Firebase/storage'
 import styled from '@emotion/styled'
+import { useExperiences } from '../../hooks/useExperiences'
 import styles from '../../Styles'
 import Button from '../Elements/Button'
 import CheckIcon from '../Icons/check'
@@ -12,9 +13,9 @@ import { Editor } from 'react-draft-wysiwyg'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import '../../Styles/react-draft-wysiwyg.css'
 import draftToHtml from 'draftjs-to-html'
+import draftToMarkdown from 'draftjs-to-markdown'
 import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
-import useStorage from '../../Firebase/storage'
 import { stripHtml } from '../../helpers'
 
 /* 
@@ -93,6 +94,7 @@ const PostForm = () => {
 
     const storyRaw = convertToRaw(editorState.getCurrentContent())
     const storyHTML = draftToHtml(storyRaw)
+    const storyMarkdown = draftToMarkdown(storyRaw)
 
     const data = {
       title,
@@ -101,6 +103,7 @@ const PostForm = () => {
         raw: JSON.stringify(storyRaw),
         html: JSON.stringify(storyHTML),
         text: stripHtml(storyHTML),
+        markdown: JSON.stringify(storyMarkdown),
       },
       images: [],
       categories: categories || [],
@@ -118,6 +121,7 @@ const PostForm = () => {
       console.log('Here trigger "addExperience"')
 
       actions.addExperience(data)
+      // TODO: try catch await ... reset form after success
     }
   }
 
