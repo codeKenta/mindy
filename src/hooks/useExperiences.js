@@ -49,6 +49,7 @@ const actionTypes = {
   errorOccured: 'errorOccured',
   addExperience: 'addExperience',
   getExperiences: 'getExperiences',
+  getExperience: 'getExperience',
 }
 
 const statusNames = {
@@ -56,6 +57,7 @@ const statusNames = {
   pending: 'pending',
   getExperiencesSuccess: 'load-experiences-success',
   addExperienceSuccess: 'add-experiences-success',
+  getExperienceSuccess: 'get-experience-success',
 }
 
 export const useExperiences = () => {
@@ -64,6 +66,9 @@ export const useExperiences = () => {
 
   const pendingStart = () => {
     dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
+  }
+  const pendingEnd = statusName => {
+    dispatch({ type: actionTypes.pendingEnd, payload: { status: statusName } })
   }
 
   const errorOccured = errorMsg => {
@@ -94,6 +99,20 @@ export const useExperiences = () => {
     }
   }
 
+  const getExperience = async docId => {
+    pendingStart()
+    try {
+      const experience = await db.getExperience(user.uid, docId)
+      pendingEnd(statusNames.getExperienceSuccess)
+      return experience
+    } catch (error) {
+      errorOccured('The experience could not be fetched')
+      console.log('error get experience', error)
+      throw Error(error)
+    }
+  }
+
+  console.log('STATE IN USE REDUCER', state)
   return {
     experiences: state.experiences,
     status: state.status,
@@ -101,6 +120,7 @@ export const useExperiences = () => {
     statusNames,
     actions: {
       addExperience,
+      getExperience,
     },
   }
 }
@@ -111,6 +131,13 @@ const experiencesReducer = (state, { type, payload }) => {
       return {
         ...state,
         status: statusNames.pending,
+      }
+    }
+
+    case actionTypes.pendingEnd: {
+      return {
+        ...state,
+        status: payload.status,
       }
     }
 

@@ -33,7 +33,7 @@ SLATE https://www.npmjs.com/package/slate
 //   // return stateToHTML(convertFromRaw(JSON.parse(text)))
 // }
 
-const PostForm = () => {
+const PostForm = ({ docId }) => {
   const theme = useTheme()
 
   const { uid: userId } = useSession()
@@ -72,9 +72,17 @@ const PostForm = () => {
     }
   }
 
+  const initFormWithExperience = async () => {
+    if (docId) {
+      const exp = await actions.getExperience(docId)
+      console.log('existing experience', exp)
+    }
+  }
+
   // init component, prefill with data if there is a edit or any draft in local storage
   useEffect(() => {
-    if (localStorage[userId]) {
+    initFormWithExperience()
+    if (!docId && localStorage[userId]) {
       const draft = JSON.parse(localStorage[userId])
       setEditorState(EditorState.createWithContent(convertFromRaw(draft)))
     }

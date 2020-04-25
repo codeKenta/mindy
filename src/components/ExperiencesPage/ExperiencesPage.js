@@ -6,6 +6,7 @@ import Heading from '../Elements/Heading'
 import styled from '@emotion/styled'
 import ReactMarkdown from 'react-markdown'
 import styles from '../../Styles'
+import { Link } from '@reach/router'
 
 const ExperiencesPage = () => {
   const { experiences } = useExperiences()
@@ -26,6 +27,11 @@ const ExperiencesPage = () => {
   const Categories = styled.span`
     display: block;
     font-style: italic;
+  `
+
+  const TopGroup = styled.div`
+    display: flex;
+    justify-content: space-between;
   `
 
   const Story = styled.p``
@@ -71,7 +77,10 @@ const ExperiencesPage = () => {
     // console.log('the exp', exp)
     return (
       <Experience key={exp.date.toString()}>
-        <Heading level={2}>{exp.title}</Heading>
+        <TopGroup>
+          <Heading level={2}>{exp.title}</Heading>
+          <Link to={`/edit-story/${exp.docId}`}>Edit</Link>
+        </TopGroup>
         <Date>
           <Moment format="dddd, MMMM Do YYYY">{exp.date}</Moment>
         </Date>
