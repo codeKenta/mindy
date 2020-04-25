@@ -14,9 +14,11 @@ export const ExperiencesProvider = ({ children }) => {
 
   React.useEffect(() => {
     const getExperiences = async () => {
-      dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
+      dispatch({ type: actionTypes.fetchStart, status: statusNames.fetching })
       try {
         const experiences = await db.getExperiences(user.uid)
+
+        console.log('INIT LOAD EXPERIENCES in useExperiences', experiences)
         dispatch({
           type: actionTypes.getExperiences,
           payload: { experiences },
@@ -45,7 +47,7 @@ export const ExperiencesProvider = ({ children }) => {
 }
 
 const actionTypes = {
-  pendingStart: 'pendingStart',
+  fetchStart: 'fetchStart',
   errorOccured: 'errorOccured',
   addExperience: 'addExperience',
   getExperiences: 'getExperiences',
@@ -54,7 +56,7 @@ const actionTypes = {
 
 const statusNames = {
   error: 'error',
-  pending: 'pending',
+  fetching: 'fetching',
   getExperiencesSuccess: 'load-experiences-success',
   addExperienceSuccess: 'add-experiences-success',
   getExperienceSuccess: 'get-experience-success',
@@ -64,11 +66,11 @@ export const useExperiences = () => {
   const [state, dispatch] = useContext(ExperiencesContext)
   const user = useSession()
 
-  const pendingStart = () => {
-    dispatch({ type: actionTypes.pendingStart, status: statusNames.pending })
+  const fetchStart = () => {
+    dispatch({ type: actionTypes.fetchStart, status: statusNames.fetching })
   }
-  const pendingEnd = statusName => {
-    dispatch({ type: actionTypes.pendingEnd, payload: { status: statusName } })
+  const fetchEnd = statusName => {
+    dispatch({ type: actionTypes.fetchEnd, payload: { status: statusName } })
   }
 
   const errorOccured = errorMsg => {
@@ -81,7 +83,7 @@ export const useExperiences = () => {
   }
 
   const addExperience = async experience => {
-    pendingStart()
+    fetchStart()
     const newExperience = { ...experience, uid: user.uid }
     try {
       const savedExperience = await db.addExperience(newExperience)
@@ -100,10 +102,11 @@ export const useExperiences = () => {
   }
 
   const getExperience = async docId => {
-    pendingStart()
+    fetchStart()
     try {
-      const experience = await db.getExperience(user.uid, docId)
-      pendingEnd(statusNames.getExperienceSuccess)
+      const experience = await db.getExperience(docId)
+      fetchEnd(statusNames.getExperienceSuccess)
+
       return experience
     } catch (error) {
       errorOccured('The experience could not be fetched')
@@ -112,7 +115,6 @@ export const useExperiences = () => {
     }
   }
 
-  console.log('STATE IN USE REDUCER', state)
   return {
     experiences: state.experiences,
     status: state.status,
@@ -127,14 +129,14 @@ export const useExperiences = () => {
 
 const experiencesReducer = (state, { type, payload }) => {
   switch (type) {
-    case actionTypes.pendingStart: {
+    case actionTypes.fetchStart: {
       return {
         ...state,
-        status: statusNames.pending,
+        status: statusNames.fetch,
       }
     }
 
-    case actionTypes.pendingEnd: {
+    case actionTypes.fetchEnd: {
       return {
         ...state,
         status: payload.status,

@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
-const DateInput = ({ onChange, className, id }) => {
-  const [date, setDate] = useState(new Date())
+const DateInput = ({ onChange, className, id, initialDate }) => {
+  const [date, setDate] = useState(initialDate)
 
   const handleChange = date => {
     setDate(date)

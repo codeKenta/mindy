@@ -48,6 +48,17 @@ const PostForm = ({ docId }) => {
     uploadFiles,
   ] = useStorage()
 
+  /*
+   * Form states and handlers
+   */
+
+  const [initialFormValues, setInitalFormValues] = useState({
+    title: '',
+    date: new Date(),
+  })
+
+  const [storySimpleText, setStorySimpleText] = useState(null)
+
   const [images, setImages] = useState([])
   const [countInputs, setCountInputs] = useState(0)
 
@@ -75,7 +86,43 @@ const PostForm = ({ docId }) => {
   const initFormWithExperience = async () => {
     if (docId) {
       const exp = await actions.getExperience(docId)
-      console.log('existing experience', exp)
+
+      /*
+        * categories: Array [ "sp" 
+        * date: "2020-04-24T18:13:13.000Z"
+        docId: "mILBcPj72s42uZhhEQ9b"
+        isPublic: false
+        * story: "fsafasf"
+        * title: "was waswas"
+        * images ----
+        uid: "Wc8hqDNG5qPuJKc5Ui6WqQIXPtH2"
+      */
+
+      console.log('exisitn exp', exp)
+      // TODO: Save the reuslt to state
+
+      setInitalFormValues({
+        title: exp.title,
+        date: new Date(exp.date),
+      })
+
+      if (typeof exp.story === 'object') {
+        setEditorState(
+          EditorState.createWithContent(
+            convertFromRaw(JSON.parse(exp.story.raw))
+          )
+        )
+      }
+      if (typeof exp.story === 'string') {
+        setStorySimpleText(exp.story)
+      }
+
+      /**
+       *  4. Images 
+       *  5. Categories
+
+       *  6. Check the local storage check. Easy fix, just dont save local storage if there is edit dvs if docId
+       */
     }
   }
 
@@ -129,7 +176,6 @@ const PostForm = ({ docId }) => {
       console.log('Here trigger "addExperience"')
 
       actions.addExperience(data)
-      // TODO: try catch await ... reset form after success
     }
   }
 
@@ -262,6 +308,7 @@ const PostForm = ({ docId }) => {
 
   return (
     <Form
+      initialValues={initialFormValues}
       onSubmit={onSubmit}
       render={({ handleSubmit, form, submitting }) => (
         <form
@@ -279,12 +326,14 @@ const PostForm = ({ docId }) => {
                   name="title"
                   component="input"
                   className="input text"
+                  // initialValue={titleField}
+                  // onChange={handleTitleField}
                   // required
                 />
               </FormGroup>
             )}
           </Field>
-
+{storySimpleText && <p>storySimpleText</p>}
           <FormGroup className="story">
             <Label htmlFor="story">Story</Label>
             <Field
@@ -327,7 +376,11 @@ const PostForm = ({ docId }) => {
             <Field
               name="date"
               render={({ input }) => (
-                <DateInput className="input text" {...input} />
+                <DateInput
+                  className="input text"
+                  initialDate={initialFormValues.date}
+                  {...input}
+                />
               )}
             />
           </FormGroup>

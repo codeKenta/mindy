@@ -74,7 +74,6 @@ const ExperiencesPage = () => {
         ? JSON.parse(exp.story.markdown)
         : null
 
-    // console.log('the exp', exp)
     return (
       <Experience key={exp.date.toString()}>
         <TopGroup>
