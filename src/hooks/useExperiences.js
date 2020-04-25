@@ -60,6 +60,7 @@ const statusNames = {
   getExperiencesSuccess: 'load-experiences-success',
   addExperienceSuccess: 'add-experiences-success',
   getExperienceSuccess: 'get-experience-success',
+  updateExperienceSuccess: 'update-experience-success',
 }
 
 export const useExperiences = () => {
@@ -115,6 +116,19 @@ export const useExperiences = () => {
     }
   }
 
+  const updateExperience = async (docId, data) => {
+    fetchStart()
+    try {
+      const updatedExperience = await db.updateExperience(docId, data)
+      fetchEnd(statusNames.updateExperienceSuccess)
+      return updatedExperience
+    } catch (error) {
+      errorOccured('The experience could not be updated')
+    }
+  }
+
+  // TODO:! Save new and edited stories to state correct so we dont need to fetch new data to se updates
+
   return {
     experiences: state.experiences,
     status: state.status,
@@ -123,6 +137,7 @@ export const useExperiences = () => {
     actions: {
       addExperience,
       getExperience,
+      updateExperience,
     },
   }
 }

@@ -51,4 +51,18 @@ export default {
         throw 'Data could not be found for the story'
       })
   },
+  updateExperience: async (docId, data) => {
+    try {
+      const updateResult = await db
+        .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
+        .doc(docId)
+        .update({
+          ...data,
+        })
+
+      return updateResult
+    } catch (error) {
+      throw error
+    }
+  },
 }

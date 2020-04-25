@@ -52,6 +52,9 @@ const ExperiencesPage = () => {
         case 'vd':
           categoryNames.push('Vivid Dream')
           break
+        case 'sp':
+          categoryNames.push('Sleep paralysis')
+          break
         case 'm':
           categoryNames.push('Meditation')
           break

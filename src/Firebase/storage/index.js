@@ -81,11 +81,16 @@ const useStorage = () => {
     let urls = []
     for (const file of files) {
       if (!isError) {
-        try {
-          const url = await uploadToFirebase(file)
-          await urls.push(url)
-        } catch (error) {
-          setIsError(error)
+        // If the post is being edited and it already has file/files uploaded.
+        if (typeof file === 'string') {
+          urls.push(file)
+        } else {
+          try {
+            const url = await uploadToFirebase(file)
+            await urls.push(url)
+          } catch (error) {
+            setIsError(error)
+          }
         }
       }
     }
