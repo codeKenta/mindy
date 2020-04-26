@@ -9,3 +9,18 @@ exports.onCreatePage = ({ page, actions }) => {
     createPage(page)
   }
 }
+
+exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
+  if (stage === 'build-html') {
+    actions.setWebpackConfig({
+      module: {
+        rules: [
+          {
+            test: /(react-draft-wysiwyg|draftjs-to-markdown)/,
+            use: loaders.null(),
+          },
+        ],
+      },
+    })
+  }
+}
