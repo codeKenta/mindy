@@ -40,7 +40,7 @@ const Navbar = () => {
 
         <Menu>
           <Link to="/">Your stories</Link>
-          <Link to="/story">New story</Link>
+          <Link to="/new-story">New story</Link>
         </Menu>
       </ContentWrapper>
     </StyledNavbar>

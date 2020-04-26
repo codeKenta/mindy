@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import Loadable from 'react-loadable'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useSession } from '../../Firebase/Auth/Auth'
@@ -18,22 +19,14 @@ import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
 import { stripHtml } from '../../helpers'
 
-/* 
-editor alternative
-SLATE https://www.npmjs.com/package/slate 
-*/
-
-// Just trying my best
-// import { stateToHTML } from 'draft-js-export-html'
-
-// const convertCommentFromJSONToHTML = text => {
-//   if (text) {
-//     return stateToHTML(convertFromRaw(text))
+// const LoadableEditor = Loadable({
+//   loader: () => import('react-draft-wysiwyg'),
+//   loading() {
+//     return <div>Loading...</div>
 //   }
-//   // return stateToHTML(convertFromRaw(JSON.parse(text)))
-// }
+// });
 
-const PostForm = () => {
+const PostForm = ({ docId }) => {
   const theme = useTheme()
 
   const { uid: userId } = useSession()
@@ -47,6 +40,18 @@ const PostForm = () => {
     },
     uploadFiles,
   ] = useStorage()
+
+  /*
+   * Form states and handlers
+   */
+
+  const [initialFormValues, setInitalFormValues] = useState({
+    title: '',
+    date: new Date(),
+    categories: [],
+  })
+
+  const [storySimpleText, setStorySimpleText] = useState(null)
 
   const [images, setImages] = useState([])
   const [countInputs, setCountInputs] = useState(0)
@@ -72,9 +77,45 @@ const PostForm = () => {
     }
   }
 
+  const initFormWithExperience = async () => {
+    if (docId) {
+      const exp = await actions.getExperience(docId)
+
+      console.log('exisitn exp', exp)
+      // TODO: Save the reuslt to state
+
+      setInitalFormValues({
+        title: exp.title,
+        date: new Date(exp.date),
+        categories: exp.categories,
+      })
+
+      if (exp.images) {
+        console.log('IF IMAGES in init postform')
+        setImages(exp.images)
+      }
+
+      if (typeof exp.story === 'object') {
+        setEditorState(
+          EditorState.createWithContent(
+            convertFromRaw(JSON.parse(exp.story.raw))
+          )
+        )
+      }
+      if (typeof exp.story === 'string') {
+        setStorySimpleText(exp.story)
+      }
+
+      /**
+       *  6. Check the local storage check. Easy fix, just dont save local storage if there is edit dvs if docId
+       */
+    }
+  }
+
   // init component, prefill with data if there is a edit or any draft in local storage
   useEffect(() => {
-    if (localStorage[userId]) {
+    initFormWithExperience()
+    if (!docId && localStorage[userId]) {
       const draft = JSON.parse(localStorage[userId])
       setEditorState(EditorState.createWithContent(convertFromRaw(draft)))
     }
@@ -115,21 +156,17 @@ const PostForm = () => {
 
       if (!uploadError && storedImagesUrls.length > 0) {
         const dataWithImages = { ...data, images: storedImagesUrls }
-        actions.addExperience(dataWithImages)
+
+        docId
+          ? actions.updateExperience(docId, dataWithImages)
+          : actions.addExperience(dataWithImages)
       }
     } else {
-      console.log('Here trigger "addExperience"')
-
-      actions.addExperience(data)
-      // TODO: try catch await ... reset form after success
+      docId
+        ? actions.updateExperience(docId, data)
+        : actions.addExperience(data)
     }
   }
-
-  // useEffect(() => {
-  //   const raw = convertToRaw(editorState.getCurrentContent())
-  //   const html = draftToHtml(raw)
-  //   const json = JSON.stringify(raw)
-  // }, [editorState])
 
   const Label = styled.label`
     display: block;
@@ -239,12 +276,6 @@ const PostForm = () => {
     padding: ${styles.space.s};
   `
 
-  // const DropZoneContainer = styled.div`
-  //   display: grid;
-  //   width: 100%;
-  //   height: 100%;
-  // `
-
   const ImagesContainer = styled.div`
     display: grid;
     grid-template-columns: 1fr;
@@ -254,6 +285,7 @@ const PostForm = () => {
 
   return (
     <Form
+      initialValues={initialFormValues}
       onSubmit={onSubmit}
       render={({ handleSubmit, form, submitting }) => (
         <form
@@ -271,12 +303,11 @@ const PostForm = () => {
                   name="title"
                   component="input"
                   className="input text"
-                  // required
                 />
               </FormGroup>
             )}
           </Field>
-
+          {storySimpleText && <p>storySimpleText</p>}
           <FormGroup className="story">
             <Label htmlFor="story">Story</Label>
             <Field
@@ -319,7 +350,11 @@ const PostForm = () => {
             <Field
               name="date"
               render={({ input }) => (
-                <DateInput className="input text" {...input} />
+                <DateInput
+                  className="input text"
+                  initialDate={initialFormValues.date}
+                  {...input}
+                />
               )}
             />
           </FormGroup>
@@ -333,6 +368,7 @@ const PostForm = () => {
                   type="checkbox"
                   name="categories"
                   value="d"
+                  initialValue={initialFormValues.categories.includes('d')}
                   render={({ input }) => (
                     <CheckBoxWrapper>
                       <span>Dream</span>
@@ -350,6 +386,7 @@ const PostForm = () => {
                   type="checkbox"
                   name="categories"
                   value="vd"
+                  initialValue={initialFormValues.categories.includes('vd')}
                   render={({ input }) => (
                     <CheckBoxWrapper>
                       <span>Vivid Dream</span>
@@ -367,6 +404,7 @@ const PostForm = () => {
                   type="checkbox"
                   name="categories"
                   value="ld"
+                  initialValue={initialFormValues.categories.includes('ld')}
                   render={({ input }) => (
                     <CheckBoxWrapper>
                       <span>Lucid Dream</span>
@@ -384,6 +422,7 @@ const PostForm = () => {
                   type="checkbox"
                   name="categories"
                   value="sp"
+                  initialValue={initialFormValues.categories.includes('sp')}
                   render={({ input }) => (
                     <CheckBoxWrapper>
                       <span>Sleep Paralysis</span>
@@ -401,6 +440,7 @@ const PostForm = () => {
                   type="checkbox"
                   name="categories"
                   value="obe"
+                  initialValue={initialFormValues.categories.includes('obe')}
                   render={({ input }) => (
                     <CheckBoxWrapper>
                       <span>OBE</span>
@@ -418,6 +458,7 @@ const PostForm = () => {
                   type="checkbox"
                   name="categories"
                   value="ap"
+                  initialValue={initialFormValues.categories.includes('ap')}
                   render={({ input }) => (
                     <CheckBoxWrapper>
                       <span>Astral Projection</span>
@@ -435,6 +476,7 @@ const PostForm = () => {
                   type="checkbox"
                   name="categories"
                   value="m"
+                  initialValue={initialFormValues.categories.includes('m')}
                   render={({ input }) => (
                     <CheckBoxWrapper>
                       <span>Meditation</span>
@@ -452,6 +494,7 @@ const PostForm = () => {
                   type="checkbox"
                   name="categories"
                   value="other"
+                  initialValue={initialFormValues.categories.includes('other')}
                   render={({ input }) => (
                     <CheckBoxWrapper>
                       <span>Other</span>
@@ -469,9 +512,7 @@ const PostForm = () => {
           <FormGroup className="img">
             <Label as="span">Images</Label>
             <ImagesContainer>
-              {/* <DropZoneContainer> */}
               <DropZone images={images} handleImages={setImages} />
-              {/* </DropZoneContainer> */}
               <ImagePreview images={images} />
             </ImagesContainer>
           </FormGroup>

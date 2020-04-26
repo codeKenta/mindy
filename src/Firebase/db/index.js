@@ -14,7 +14,7 @@ export default {
       throw error
     }
   },
-  getExperiences: uid => {
+  getExperiences: async uid => {
     return db
       .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
       .where('uid', '==', uid)
@@ -30,11 +30,39 @@ export default {
         return data
       })
   },
+
+  getExperience: async docId => {
+    return db
+      .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
+      .doc(docId)
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          return {
+            ...doc.data(),
+            docId: doc.id,
+          }
+        } else {
+          // doc.data() will be undefined in this case
+          throw 'Data could not be found for the story'
+        }
+      })
+      .catch(error => {
+        throw 'Data could not be found for the story'
+      })
+  },
+  updateExperience: async (docId, data) => {
+    try {
+      const updateResult = await db
+        .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
+        .doc(docId)
+        .update({
+          ...data,
+        })
+
+      return updateResult
+    } catch (error) {
+      throw error
+    }
+  },
 }
-
-// let query = firestore.collection('col').where('foo', '>', 42);
-
-// query.orderBy('foo', 'desc').get().then(querySnapshot => {
-//   querySnapshot.forEach(documentSnapshot => {
-//     console.log(`Found document at ${documentSnapshot.ref.path}`);
-//   });

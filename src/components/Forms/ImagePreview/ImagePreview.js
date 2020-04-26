@@ -58,28 +58,35 @@ const Image = styled.img`
   width: 100%;
   object-fit: cover;
 `
+
 function ImagePreview({ images }) {
+  const getSourceFromIndex = index => {
+    return typeof images[index] === 'string'
+      ? images[index]
+      : images[index].preview
+  }
+  console.log('IMAGE PREVEIW', images)
   const theme = useTheme()
   return (
     <PreviewContainer>
       <InnerGrid>
         <FeaturedImageWrapper hasImage={images.length >= 1} theme={theme}>
           {images.length >= 1 ? (
-            <Image src={images[0].preview} />
+            <Image src={getSourceFromIndex(0)} />
           ) : (
             <FontAwesomeIcon size="3x" color={theme.primary} icon={faImage} />
           )}
         </FeaturedImageWrapper>
         <SecondImageWrapper hasImage={images.length >= 2} theme={theme}>
           {images.length >= 2 ? (
-            <Image src={images[1].preview} />
+            <Image src={getSourceFromIndex(1)} />
           ) : (
             <FontAwesomeIcon size="2x" color={theme.primary} icon={faImage} />
           )}
         </SecondImageWrapper>
         <ThirdImageWrapper hasImage={images.length === 3} theme={theme}>
           {images.length === 3 ? (
-            <Image src={images[2].preview} />
+            <Image src={getSourceFromIndex(2)} />
           ) : (
             <FontAwesomeIcon size="2x" color={theme.primary} icon={faImage} />
           )}
