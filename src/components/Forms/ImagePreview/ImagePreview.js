@@ -65,7 +65,6 @@ function ImagePreview({ images }) {
       ? images[index]
       : images[index].preview
   }
-  console.log('IMAGE PREVEIW', images)
   const theme = useTheme()
   return (
     <PreviewContainer>

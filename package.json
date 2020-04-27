@@ -41,9 +41,9 @@
     "react-final-form": "^6.3.5",
     "react-firebase-hooks": "^2.1.1",
     "react-helmet": "^5.2.1",
-    "react-loadable": "^5.5.0",
     "react-markdown": "^4.3.1",
-    "react-moment": "^0.9.7"
+    "react-moment": "^0.9.7",
+    "react-spinners": "^0.8.1"
   },
   "devDependencies": {
     "prettier": "^1.19.1",

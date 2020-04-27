@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import Loadable from 'react-loadable'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useSession } from '../../Firebase/Auth/Auth'
@@ -18,13 +17,6 @@ import draftToMarkdown from 'draftjs-to-markdown'
 import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
 import { stripHtml } from '../../helpers'
-
-// const LoadableEditor = Loadable({
-//   loader: () => import('react-draft-wysiwyg'),
-//   loading() {
-//     return <div>Loading...</div>
-//   }
-// });
 
 const PostForm = ({ docId }) => {
   const theme = useTheme()

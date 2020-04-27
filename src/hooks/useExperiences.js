@@ -3,6 +3,26 @@ import { useSession } from '../Firebase/Auth/Auth'
 import db from '../Firebase/db'
 const ExperiencesContext = React.createContext(null)
 
+const statusMessages = {}
+
+const actionTypes = {
+  fetchStart: 'FETCH_START',
+  errorOccured: 'ERROR_OCCURED',
+  addExperience: 'ADD_EXPERIENCE',
+  updateExperience: 'UPDATE_EXPERIENCE',
+  getExperiences: 'GET_EXPERIENCES',
+  getExperience: 'GET_EXPERIENCE',
+}
+
+const statusNames = {
+  error: 'error',
+  fetching: 'fetching',
+  getExperiencesSuccess: 'load-experiences-success',
+  addExperienceSuccess: 'add-experiences-success',
+  getExperienceSuccess: 'get-experience-success',
+  updateExperienceSuccess: 'update-experience-success',
+}
+
 export const ExperiencesProvider = ({ children }) => {
   const [state, dispatch] = useReducer(experiencesReducer, {
     experiences: [],
@@ -14,11 +34,13 @@ export const ExperiencesProvider = ({ children }) => {
 
   React.useEffect(() => {
     const getExperiences = async () => {
-      dispatch({ type: actionTypes.fetchStart, status: statusNames.fetching })
+      dispatch({
+        type: actionTypes.fetchStart,
+        statusMessage: 'Loading stories',
+      })
       try {
         const experiences = await db.getExperiences(user.uid)
 
-        console.log('INIT LOAD EXPERIENCES in useExperiences', experiences)
         dispatch({
           type: actionTypes.getExperiences,
           payload: { experiences },
@@ -46,32 +68,15 @@ export const ExperiencesProvider = ({ children }) => {
   )
 }
 
-const actionTypes = {
-  fetchStart: 'fetchStart',
-  errorOccured: 'errorOccured',
-  addExperience: 'addExperience',
-  getExperiences: 'getExperiences',
-  getExperience: 'getExperience',
-}
-
-const statusNames = {
-  error: 'error',
-  fetching: 'fetching',
-  getExperiencesSuccess: 'load-experiences-success',
-  addExperienceSuccess: 'add-experiences-success',
-  getExperienceSuccess: 'get-experience-success',
-  updateExperienceSuccess: 'update-experience-success',
-}
-
 export const useExperiences = () => {
   const [state, dispatch] = useContext(ExperiencesContext)
   const user = useSession()
 
-  const fetchStart = () => {
-    dispatch({ type: actionTypes.fetchStart, status: statusNames.fetching })
+  const fetchStart = (statusMessage = '') => {
+    dispatch({ type: actionTypes.fetchStart, statusMessage })
   }
-  const fetchEnd = statusName => {
-    dispatch({ type: actionTypes.fetchEnd, payload: { status: statusName } })
+  const fetchEnd = (status, statusMessage = '') => {
+    dispatch({ type: actionTypes.fetchEnd, status, statusMessage })
   }
 
   const errorOccured = errorMsg => {
@@ -84,7 +89,7 @@ export const useExperiences = () => {
   }
 
   const addExperience = async experience => {
-    fetchStart()
+    fetchStart('Saving your story')
     const newExperience = { ...experience, uid: user.uid }
     try {
       const savedExperience = await db.addExperience(newExperience)
@@ -117,10 +122,14 @@ export const useExperiences = () => {
   }
 
   const updateExperience = async (docId, data) => {
-    fetchStart()
+    fetchStart('Saving your story')
     try {
       const updatedExperience = await db.updateExperience(docId, data)
-      fetchEnd(statusNames.updateExperienceSuccess)
+
+      dispatch({
+        type: actionTypes.updateExperience,
+        payload: { ...data, docId },
+      })
       return updatedExperience
     } catch (error) {
       errorOccured('The experience could not be updated')
@@ -142,22 +151,32 @@ export const useExperiences = () => {
   }
 }
 
-const experiencesReducer = (state, { type, payload }) => {
+const experiencesReducer = (
+  state,
+  { type, status, statusMessage = '', payload }
+) => {
   switch (type) {
     case actionTypes.fetchStart: {
       return {
         ...state,
         status: statusNames.fetch,
+        statusMessage: statusMessage,
       }
     }
+
+    // dispatch({ type: actionTypes.fetchEnd, statusMessage: message })
 
     case actionTypes.fetchEnd: {
       return {
         ...state,
-        status: payload.status,
+        status: status,
+        statusMessage: statusMessage,
       }
     }
 
+    /*
+    Maybe have error in separate obj
+    */
     case actionTypes.errorOccured: {
       return {
         ...state,
@@ -171,6 +190,7 @@ const experiencesReducer = (state, { type, payload }) => {
         ...state,
         experiences: payload.experiences || [],
         status: statusNames.getExperiencesSuccess,
+        statusMessage: null,
       }
     }
 
@@ -185,6 +205,22 @@ const experiencesReducer = (state, { type, payload }) => {
         status: statusNames.addExperienceSuccess,
         statusMessage: 'Your story has been saved',
         experiences,
+      }
+    }
+
+    case actionTypes.updateExperience: {
+      // let experiences = [...state.experiences]
+      // experiences.push({
+      //   ...payload,
+      // })
+
+      // UPDATE RESULT IN ARRAY
+
+      return {
+        ...state,
+        status: statusNames.updateExperienceSuccess,
+        statusMessage: 'Your story has been updated',
+        // experiences,
       }
     }
 
