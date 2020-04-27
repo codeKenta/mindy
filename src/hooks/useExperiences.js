@@ -1,9 +1,11 @@
 import React, { useContext, useReducer } from 'react'
 import { useSession } from '../Firebase/Auth/Auth'
+import useStorage from '../Firebase/storage'
+
 import db from '../Firebase/db'
 const ExperiencesContext = React.createContext(null)
 
-const statusMessages = {}
+// const statusMessages = {}
 
 const actionTypes = {
   fetchStart: 'FETCH_START',
@@ -72,6 +74,15 @@ export const useExperiences = () => {
   const [state, dispatch] = useContext(ExperiencesContext)
   const user = useSession()
 
+  const [
+    {
+      // isLoading: uploadIsLoading,
+      isError: uploadError,
+      // progress: uploadProgress,
+    },
+    uploadFiles,
+  ] = useStorage()
+
   const fetchStart = (statusMessage = '') => {
     dispatch({ type: actionTypes.fetchStart, statusMessage })
   }
@@ -88,25 +99,6 @@ export const useExperiences = () => {
     })
   }
 
-  const addExperience = async experience => {
-    fetchStart('Saving your story')
-    const newExperience = { ...experience, uid: user.uid }
-    try {
-      const savedExperience = await db.addExperience(newExperience)
-
-      localStorage.removeItem(user.uid)
-
-      dispatch({
-        type: actionTypes.addExperience,
-        payload: { ...savedExperience },
-      })
-    } catch (error) {
-      errorOccured('The story could not be saved')
-      console.log('error add exp', error)
-      throw Error(error)
-    }
-  }
-
   const getExperience = async docId => {
     fetchStart()
     try {
@@ -121,10 +113,49 @@ export const useExperiences = () => {
     }
   }
 
+  const addExperience = async experience => {
+    fetchStart('Saving your story')
+    let experienceData = { ...experience, uid: user.uid }
+
+    try {
+      if (experienceData.images.length > 0) {
+        fetchStart('Uploading files')
+        const storedImagesUrls = await uploadFiles(experienceData.images)
+        if (!uploadError && storedImagesUrls.length > 0) {
+          experienceData = { ...experienceData, images: storedImagesUrls }
+        }
+      }
+
+      const savedExperience = await db.addExperience(experienceData)
+
+      localStorage.removeItem(user.uid)
+
+      dispatch({
+        type: actionTypes.addExperience,
+        payload: { ...savedExperience },
+      })
+    } catch (error) {
+      errorOccured('The story could not be saved')
+      console.log('error add exp', error)
+      throw Error(error)
+    }
+  }
+
   const updateExperience = async (docId, data) => {
     fetchStart('Saving your story')
+
+    let experienceData = { ...data }
+
     try {
-      const updatedExperience = await db.updateExperience(docId, data)
+      if (experienceData.images.length > 0) {
+        fetchStart('Uploading files')
+        const storedImagesUrls = await uploadFiles(experienceData.images)
+        if (!uploadError && storedImagesUrls.length > 0) {
+          experienceData = { ...experienceData, images: storedImagesUrls }
+        }
+      }
+
+      const updatedExperience = await db.updateExperience(docId, experienceData)
 
       dispatch({
         type: actionTypes.updateExperience,

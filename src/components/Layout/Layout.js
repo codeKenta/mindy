@@ -5,7 +5,6 @@ import Footer from '../DocumentStructure/Footer'
 import PageContent from '../DocumentStructure/PageContent'
 import styled from '@emotion/styled'
 import { helpers } from '../../Styles'
-import Modal from '../Modals/Modal'
 
 const LayoutWrapper = styled.div`
   display: grid;
@@ -18,7 +17,6 @@ const LayoutWrapper = styled.div`
 const Layout = ({ background, children }) => {
   return (
     <LayoutWrapper background={background}>
-      <Modal />
       <Navbar />
       <PageContent as="main">{children}</PageContent>
       <Footer />
