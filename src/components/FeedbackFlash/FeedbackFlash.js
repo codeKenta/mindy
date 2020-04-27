@@ -8,6 +8,7 @@ import styles from '../../Styles'
 import { useExperiences } from '../../hooks/useExperiences'
 import { css } from '@emotion/core'
 import GridLoader from 'react-spinners/GridLoader'
+import CircleCheckLoader from '../Loaders/CircleCheckLoader'
 
 const FeedbackFlash = props => {
   const theme = useTheme()
@@ -42,7 +43,8 @@ const FeedbackFlash = props => {
   return (
     <FeedbackContainer>
       <h3>Feedback</h3>
-      <p>{statusMessage}</p>
+      <span>{statusMessage}</span>
+      <CircleCheckLoader />
       <GridLoader
         //   css={override}
         size={150}

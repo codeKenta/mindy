@@ -264,7 +264,7 @@ const PostForm = ({ docId }) => {
 
   return (
     <>
-      {showFeedback && <FeedbackFlash />}
+      {!showFeedback && <FeedbackFlash />}
       <Form
         initialValues={initialFormValues}
         onSubmit={onSubmit}
