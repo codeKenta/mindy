@@ -8,37 +8,50 @@ const CircleCheckLoader = ({ isLoading = true, done = false }) => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       setLoading(false)
-    }, 5000)
+    }, 1000)
     return () => clearInterval(intervalId)
   }, [])
 
   const brandSuccess = '#5cb85c'
-  const loaderSize = '7em'
-  const checkHeight = loaderSize / 2
-  const checkWidth = checkHeight / 2
-  const checkLeft = loaderSize / 6 + loaderSize / 12
+
+  const unit = 'em'
+
+  const loaderSizeValue = 3
+  const loaderSize = `${loaderSizeValue}${unit}`
+
+  const checkHeightValue = loaderSizeValue / 2
+  const checkHeight = `${checkHeightValue}${unit}`
+
+  const checkWidthValue = checkHeightValue / 3
+  const checkWidth = `${checkWidthValue}${unit}`
+
+  const checkLeftValue = loaderSizeValue / 10 + loaderSizeValue / 12
+  const checkLeft = `${checkLeftValue}${unit}`
+
   const checkThickness = '3px'
   const checkColor = brandSuccess
 
   const Loader = styled.div`
     &.circle-loader {
       margin-bottom: ${loaderSize} / 2;
-      border: 1px solid rgba(0, 0, 0, 0.2);
+      border: 2px solid rgba(0, 0, 0, 0.2);
       border-left-color: ${checkColor};
       animation: loader-spin 1.2s infinite linear;
       position: relative;
-      display: inline-block;
       vertical-align: top;
+      display: inline-block;
       border-radius: 50%;
       width: ${loaderSize};
       height: ${loaderSize};
     }
 
     &.load-complete {
-      -webkit-animation: none;
       animation: none;
       border-color: ${checkColor};
       transition: border 500ms ease-out;
+      .checkmark {
+        display: block;
+      }
     }
 
     .checkmark {
