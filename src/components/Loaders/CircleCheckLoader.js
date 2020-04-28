@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import styled from '@emotion/styled'
+import { useTheme } from 'emotion-theming'
 
 const CircleCheckLoader = ({ isLoading = true, done = false }) => {
+  const theme = useTheme()
   const [loading, setLoading] = useState(isLoading)
 
   useEffect(() => {
@@ -12,30 +14,15 @@ const CircleCheckLoader = ({ isLoading = true, done = false }) => {
     return () => clearInterval(intervalId)
   }, [])
 
-  const brandSuccess = '#5cb85c'
+  const loaderSize = '2em'
 
-  const unit = 'em'
+  // https://codepen.io/Elifaz/pen/oQQXzr
+  //
 
-  const loaderSizeValue = 3
-  const loaderSize = `${loaderSizeValue}${unit}`
-
-  const checkHeightValue = loaderSizeValue / 2
-  const checkHeight = `${checkHeightValue}${unit}`
-
-  const checkWidthValue = checkHeightValue / 3
-  const checkWidth = `${checkWidthValue}${unit}`
-
-  const checkLeftValue = loaderSizeValue / 10 + loaderSizeValue / 12
-  const checkLeft = `${checkLeftValue}${unit}`
-
-  const checkThickness = '3px'
-  const checkColor = brandSuccess
-
-  const Loader = styled.div`
+  const Circle = styled.div`
     &.circle-loader {
-      margin-bottom: ${loaderSize} / 2;
       border: 2px solid rgba(0, 0, 0, 0.2);
-      border-left-color: ${checkColor};
+      border-left-color: ${theme.success};
       animation: loader-spin 1.2s infinite linear;
       position: relative;
       vertical-align: top;
@@ -43,38 +30,36 @@ const CircleCheckLoader = ({ isLoading = true, done = false }) => {
       border-radius: 50%;
       width: ${loaderSize};
       height: ${loaderSize};
+      display: grid;
+      grid: 1fr / 1fr;
+      place-items: center;
+      grid-column: 1;
+      grid-row: 1;
     }
 
     &.load-complete {
       animation: none;
-      border-color: ${checkColor};
+      border-color: ${theme.success};
       transition: border 500ms ease-out;
-      .checkmark {
-        display: block;
-      }
     }
 
-    .checkmark {
-      display: none;
+    svg {
+      .path {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 0;
 
-      &.draw:after {
-        animation-duration: 800ms;
-        animation-timing-function: ease;
-        animation-name: checkmark;
-        transform: scaleX(-1) rotate(135deg);
-      }
-
-      &:after {
-        opacity: 1;
-        height: ${checkHeight};
-        width: ${checkWidth};
-        transform-origin: left top;
-        border-right: ${checkThickness} solid ${checkColor};
-        border-top: ${checkThickness} solid ${checkColor};
-        content: '';
-        left: ${checkLeft};
-        top: ${checkHeight};
-        position: absolute;
+        &.line {
+          stroke-dashoffset: 1000;
+          animation: dash 0.9s 0.35s ease-in-out forwards;
+        }
+        &.check {
+          display: none;
+          stroke-dashoffset: -100;
+          animation: dash-check 0.9s 0.35s ease-in-out forwards;
+          &.load-complete {
+            display: unset;
+          }
+        }
       }
     }
 
@@ -87,34 +72,43 @@ const CircleCheckLoader = ({ isLoading = true, done = false }) => {
       }
     }
 
-    @keyframes checkmark {
+    @keyframes dash-check {
       0% {
-        height: 0;
-        width: 0;
-        opacity: 1;
-      }
-      20% {
-        height: 0;
-        width: ${checkWidth};
-        opacity: 1;
-      }
-      40% {
-        height: ${checkHeight};
-        width: ${checkWidth};
-        opacity: 1;
+        stroke-dashoffset: -100;
       }
       100% {
-        height: ${checkHeight};
-        width: ${checkWidth};
-        opacity: 1;
+        stroke-dashoffset: 900;
+      }
+    }
+
+    @keyframes dash {
+      0% {
+        stroke-dashoffset: 1000;
+      }
+      100% {
+        stroke-dashoffset: 0;
       }
     }
   `
 
   return (
-    <Loader className={`circle-loader ${loading ? '' : 'load-complete'}`}>
-      <div className="checkmark draw"></div>
-    </Loader>
+    <Circle className={`circle-loader ${loading ? '' : 'load-complete'}`}>
+      <svg
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 130.2 130.2"
+      >
+        <polyline
+          className={`path check ${loading ? '' : 'load-complete'}`}
+          fill="none"
+          stroke={theme.success}
+          stroke-width="8"
+          stroke-linecap="round"
+          stroke-miterlimit="10"
+          points="100.2,40.2 51.5,88.8 29.8,67.5 "
+        />
+      </svg>
+    </Circle>
   )
 }
 
