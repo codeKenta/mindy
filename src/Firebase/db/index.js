@@ -65,4 +65,16 @@ export default {
       throw error
     }
   },
+  deleteExperience: async docId => {
+    try {
+      const deletedDoc = db
+        .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
+        .doc(docId)
+        .delete()
+
+      return deletedDoc
+    } catch (error) {
+      throw error
+    }
+  },
 }
