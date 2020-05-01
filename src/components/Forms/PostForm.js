@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { navigate } from 'gatsby'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useSession } from '../../Firebase/Auth/Auth'
@@ -28,6 +29,8 @@ const PostForm = ({ docId }) => {
 
   const { actions, isLoading } = useExperiences()
   const [showFeedback, setShowFeedback] = useState(false)
+
+  const [isDeleted, setIsDeleted] = useState(false)
 
   /*
    * Form states and handlers
@@ -63,30 +66,34 @@ const PostForm = ({ docId }) => {
 
   const initFormWithExperience = async () => {
     if (docId) {
-      const exp = await actions.getExperience(docId)
+      try {
+        const exp = await actions.getExperience(docId)
 
-      // TODO: Save the reuslt to state
+        // TODO: Save the reuslt to state
 
-      setInitalFormValues({
-        title: exp.title,
-        date: new Date(exp.date),
-        categories: exp.categories,
-      })
+        setInitalFormValues({
+          title: exp.title,
+          date: new Date(exp.date),
+          categories: exp.categories,
+        })
 
-      if (exp.images) {
-        console.log('IF IMAGES in init postform')
-        setImages(exp.images)
-      }
+        if (exp.images) {
+          console.log('IF IMAGES in init postform')
+          setImages(exp.images)
+        }
 
-      if (typeof exp.story === 'object') {
-        setEditorState(
-          EditorState.createWithContent(
-            convertFromRaw(JSON.parse(exp.story.raw))
+        if (typeof exp.story === 'object') {
+          setEditorState(
+            EditorState.createWithContent(
+              convertFromRaw(JSON.parse(exp.story.raw))
+            )
           )
-        )
-      }
-      if (typeof exp.story === 'string') {
-        setStorySimpleText(exp.story)
+        }
+        if (typeof exp.story === 'string') {
+          setStorySimpleText(exp.story)
+        }
+      } catch (error) {
+        navigate('/')
       }
     }
   }
@@ -117,10 +124,10 @@ const PostForm = ({ docId }) => {
     setImages([])
   }
 
-  const closeFeedback = () => {
+  const closeFeedback = delay => {
     setTimeout(() => {
       setShowFeedback(false)
-    }, 3000)
+    }, delay)
   }
 
   const onSubmit = async formInputs => {
@@ -152,16 +159,30 @@ const PostForm = ({ docId }) => {
     if (docId) {
       // Update
       actions.updateExperience(docId, data).then(() => {
-        closeFeedback()
+        closeFeedback(4000)
         localStorage.removeItem(localStorageKey)
         resetForm()
       })
     } else {
       // Add
       await actions.addExperience(data)
-      closeFeedback()
+      closeFeedback(4000)
       localStorage.removeItem(localStorageKey)
       resetForm()
+    }
+  }
+
+  const handleDeleteExperience = () => {
+    localStorage.removeItem(localStorageKey)
+    setShowFeedback(true)
+
+    if (docId) {
+      actions.deleteExperience(docId).then(() => {
+        setTimeout(() => {
+          closeFeedback(3000)
+          navigate('/')
+        }, 4000)
+      })
     }
   }
 
@@ -281,7 +302,6 @@ const PostForm = ({ docId }) => {
   `
 
   const HasDraftInfo = styled.div`
-    /* border: 1px solid ${theme.primary}; */
     background: ${theme.secondary};
     border-radius: ${styles.radius.m};
     padding: ${styles.space.m};
@@ -292,6 +312,15 @@ const PostForm = ({ docId }) => {
     p {
       margin: 0;
     }
+  `
+
+  const DeleteExperienceSection = styled.div`
+    border-top: 1px solid ${theme.secondary};
+    margin-top: ${styles.space.xxl};
+    margin-bottom: ${styles.space.xl};
+    padding-top: ${styles.space.xxl};
+    display: flex;
+    justify-content: center;
   `
 
   return (
@@ -332,7 +361,7 @@ const PostForm = ({ docId }) => {
                 </FormGroup>
               )}
             </Field>
-            {storySimpleText && <p>storySimpleText</p>}
+            {storySimpleText && <p>{storySimpleText}</p>}
             <FormGroup className="story">
               <Label htmlFor="story">Story</Label>
               <Field
@@ -569,6 +598,18 @@ const PostForm = ({ docId }) => {
           </form>
         )}
       />
+
+      {docId && (
+        <DeleteExperienceSection>
+          <Button
+            size={'s'}
+            IconComp={ClearIcon}
+            clickHandler={handleDeleteExperience}
+          >
+            delete experience
+          </Button>
+        </DeleteExperienceSection>
+      )}
     </>
   )
 }

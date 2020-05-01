@@ -3,6 +3,7 @@ import { useSession } from '../Firebase/Auth/Auth'
 import useStorage from '../Firebase/storage'
 
 import db from '../Firebase/db'
+import { navigate } from 'gatsby'
 const ExperiencesContext = React.createContext(null)
 
 // const statusMessages = {}
@@ -14,6 +15,7 @@ const actionTypes = {
   updateExperience: 'UPDATE_EXPERIENCE',
   getExperiences: 'GET_EXPERIENCES',
   getExperience: 'GET_EXPERIENCE',
+  deleteExperience: 'DELETE_EXPERIENCE',
 }
 
 const statusNames = {
@@ -23,6 +25,7 @@ const statusNames = {
   addExperienceSuccess: 'add-experiences-success',
   getExperienceSuccess: 'get-experience-success',
   updateExperienceSuccess: 'update-experience-success',
+  deleteExperienceSuccess: 'delete-exprience-success',
 }
 
 export const ExperiencesProvider = ({ children }) => {
@@ -108,8 +111,8 @@ export const useExperiences = () => {
       return experience
     } catch (error) {
       errorOccured('The experience could not be fetched')
+      // navigate('/')
       console.log('error get experience', error)
-      throw Error(error)
     }
   }
 
@@ -169,6 +172,21 @@ export const useExperiences = () => {
 
   // TODO:! Save new and edited stories to state correct so we dont need to fetch new data to se updates
 
+  const deleteExperience = async docId => {
+    fetchStart('Deleting your story')
+
+    try {
+      const deletedExperience = await db.deleteExperience(docId)
+      dispatch({
+        type: actionTypes.deleteExperience,
+        payload: { ...deletedExperience },
+      })
+      return deletedExperience
+    } catch (error) {
+      errorOccured('The experience could not be updated')
+    }
+  }
+
   return {
     experiences: state.experiences,
     status: state.status,
@@ -179,6 +197,7 @@ export const useExperiences = () => {
       addExperience,
       getExperience,
       updateExperience,
+      deleteExperience,
     },
   }
 }
@@ -251,6 +270,17 @@ const experiencesReducer = (
         status: statusNames.updateExperienceSuccess,
         statusMessage: 'Your story has been updated',
         // experiences,
+      }
+    }
+
+    case actionTypes.deleteExperience: {
+      // TODO
+      // REMOVE EXP FROM STATE EXP ARRAY
+
+      return {
+        ...state,
+        status: statusNames.deleteExperienceSuccess,
+        statusMessage: 'Your story has been deleted',
       }
     }
 
