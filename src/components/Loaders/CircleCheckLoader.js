@@ -1,20 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import styled from '@emotion/styled'
 import { useTheme } from 'emotion-theming'
 
-const CircleCheckLoader = ({ isLoading = true, done = false }) => {
+const CircleCheckLoader = ({ loading, size = '2em' }) => {
   const theme = useTheme()
-  const [loading, setLoading] = useState(isLoading)
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setLoading(false)
-    }, 1000)
-    return () => clearInterval(intervalId)
-  }, [])
-
-  const loaderSize = '2em'
 
   // https://codepen.io/Elifaz/pen/oQQXzr
   //
@@ -28,8 +18,8 @@ const CircleCheckLoader = ({ isLoading = true, done = false }) => {
       vertical-align: top;
       display: inline-block;
       border-radius: 50%;
-      width: ${loaderSize};
-      height: ${loaderSize};
+      width: ${size};
+      height: ${size};
       display: grid;
       grid: 1fr / 1fr;
       place-items: center;
@@ -102,9 +92,9 @@ const CircleCheckLoader = ({ isLoading = true, done = false }) => {
           className={`path check ${loading ? '' : 'load-complete'}`}
           fill="none"
           stroke={theme.success}
-          stroke-width="8"
-          stroke-linecap="round"
-          stroke-miterlimit="10"
+          strokeWidth="8"
+          strokeLinecap="round"
+          strokeMiterlimit="10"
           points="100.2,40.2 51.5,88.8 29.8,67.5 "
         />
       </svg>

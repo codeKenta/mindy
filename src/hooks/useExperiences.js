@@ -128,12 +128,12 @@ export const useExperiences = () => {
 
       const savedExperience = await db.addExperience(experienceData)
 
-      localStorage.removeItem(user.uid)
-
       dispatch({
         type: actionTypes.addExperience,
         payload: { ...savedExperience },
       })
+
+      return savedExperience
     } catch (error) {
       errorOccured('The story could not be saved')
       console.log('error add exp', error)
@@ -174,6 +174,7 @@ export const useExperiences = () => {
     status: state.status,
     statusMessage: state.statusMessage,
     statusNames,
+    isLoading: state.status === statusNames.fetching,
     actions: {
       addExperience,
       getExperience,
@@ -190,12 +191,10 @@ const experiencesReducer = (
     case actionTypes.fetchStart: {
       return {
         ...state,
-        status: statusNames.fetch,
+        status: statusNames.fetching,
         statusMessage: statusMessage,
       }
     }
-
-    // dispatch({ type: actionTypes.fetchEnd, statusMessage: message })
 
     case actionTypes.fetchEnd: {
       return {

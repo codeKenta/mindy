@@ -17,14 +17,16 @@ import DropZone from './DropZone/DropZone'
 import ImagePreview from './ImagePreview/ImagePreview'
 import { stripHtml } from '../../helpers'
 import FeedbackFlash from '../FeedbackFlash/FeedbackFlash'
+import ClearIcon from '@material-ui/icons/Clear'
 
 const PostForm = ({ docId }) => {
   const theme = useTheme()
 
   const { uid: userId } = useSession()
 
-  const { actions, statusNames, status, statusMessage } = useExperiences()
+  const localStorageKey = docId ? `${userId}${docId}` : userId
 
+  const { actions, isLoading } = useExperiences()
   const [showFeedback, setShowFeedback] = useState(false)
 
   /*
@@ -37,10 +39,11 @@ const PostForm = ({ docId }) => {
     categories: [],
   })
 
+  // Remove this later when existing posts are changed to rich editor format
   const [storySimpleText, setStorySimpleText] = useState(null)
 
   const [images, setImages] = useState([])
-  const [countInputs, setCountInputs] = useState(0)
+  const [countInputs, setCountInputs] = useState(-20)
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
 
@@ -50,16 +53,11 @@ const PostForm = ({ docId }) => {
   }
 
   const saveDraftToLocalStorage = () => {
-    console.log('saveDraft')
-
     setCountInputs(countInputs + 1)
-
-    if (countInputs > 10) {
-      console.log('lets save')
+    if (countInputs > 20) {
       setCountInputs(0)
-
       const draftText = convertToRaw(editorState.getCurrentContent())
-      localStorage[userId] = JSON.stringify(draftText)
+      localStorage[localStorageKey] = JSON.stringify(draftText)
     }
   }
 
@@ -67,7 +65,6 @@ const PostForm = ({ docId }) => {
     if (docId) {
       const exp = await actions.getExperience(docId)
 
-      console.log('exisitn exp', exp)
       // TODO: Save the reuslt to state
 
       setInitalFormValues({
@@ -91,26 +88,40 @@ const PostForm = ({ docId }) => {
       if (typeof exp.story === 'string') {
         setStorySimpleText(exp.story)
       }
+    }
+  }
 
-      /**
-       *  6. Check the local storage check. Easy fix, just dont save local storage if there is edit dvs if docId
-       */
+  const clearLocalStorageDraft = () => {
+    if (docId && localStorageKey) {
+      localStorage.removeItem(localStorageKey)
+      initFormWithExperience()
+    }
+  }
+
+  const initFormFromLocalStorageDraft = () => {
+    if (localStorage[localStorageKey]) {
+      const draft = JSON.parse(localStorage[localStorageKey])
+      setEditorState(EditorState.createWithContent(convertFromRaw(draft)))
     }
   }
 
   // init component, prefill with data if there is a edit or any draft in local storage
   useEffect(() => {
-    initFormWithExperience()
-    if (!docId && localStorage[userId]) {
-      const draft = JSON.parse(localStorage[userId])
-      setEditorState(EditorState.createWithContent(convertFromRaw(draft)))
-    }
+    initFormWithExperience().then(() => {
+      initFormFromLocalStorageDraft()
+    })
   }, [])
 
-  // const resetForm = () => {
-  //   // TODO: RESET FORM
-  //   setImages([])
-  // }
+  const resetForm = () => {
+    setEditorState(EditorState.createEmpty())
+    setImages([])
+  }
+
+  const closeFeedback = () => {
+    setTimeout(() => {
+      setShowFeedback(false)
+    }, 3000)
+  }
 
   const onSubmit = async formInputs => {
     setShowFeedback(true)
@@ -140,10 +151,17 @@ const PostForm = ({ docId }) => {
 
     if (docId) {
       // Update
-      actions.updateExperience(docId, data)
+      actions.updateExperience(docId, data).then(() => {
+        closeFeedback()
+        localStorage.removeItem(localStorageKey)
+        resetForm()
+      })
     } else {
       // Add
-      actions.addExperience(data)
+      await actions.addExperience(data)
+      closeFeedback()
+      localStorage.removeItem(localStorageKey)
+      resetForm()
     }
   }
 
@@ -262,9 +280,35 @@ const PostForm = ({ docId }) => {
     grid-gap: ${styles.space.l};
   `
 
+  const HasDraftInfo = styled.div`
+    /* border: 1px solid ${theme.primary}; */
+    background: ${theme.secondary};
+    border-radius: ${styles.radius.m};
+    padding: ${styles.space.m};
+    margin-bottom: ${styles.space.m};
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    p {
+      margin: 0;
+    }
+  `
+
   return (
     <>
-      {!showFeedback && <FeedbackFlash />}
+      {showFeedback && <FeedbackFlash />}
+      {docId && localStorage[localStorageKey] && (
+        <HasDraftInfo>
+          <p>This story has unsaved updates in draft</p>
+          <Button
+            size={'s'}
+            IconComp={ClearIcon}
+            clickHandler={clearLocalStorageDraft}
+          >
+            clear draft
+          </Button>
+        </HasDraftInfo>
+      )}
       <Form
         initialValues={initialFormValues}
         onSubmit={onSubmit}
@@ -518,10 +562,10 @@ const PostForm = ({ docId }) => {
               )}
             />
           </FormGroup> */}
-            <Button disabled={submitting}>save</Button>
-            {status === statusNames.addExperienceSuccess ? (
-              <p>{statusMessage}</p>
-            ) : null}
+
+            <Button disabled={submitting || isLoading}>
+              {docId ? 'update' : 'save'}
+            </Button>
           </form>
         )}
       />

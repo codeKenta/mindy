@@ -7,6 +7,7 @@ import styled from '@emotion/styled'
 import ReactMarkdown from 'react-markdown'
 import styles from '../../Styles'
 import { Link } from '@reach/router'
+import EditIcon from '@material-ui/icons/Edit'
 
 const ExperiencesPage = () => {
   const { experiences } = useExperiences()
@@ -81,7 +82,9 @@ const ExperiencesPage = () => {
       <Experience key={exp.date.toString()}>
         <TopGroup>
           <Heading level={2}>{exp.title}</Heading>
-          <Link to={`/edit-story/${exp.docId}`}>Edit</Link>
+          <Link to={`/edit-story/${exp.docId}`}>
+            <EditIcon color="primary" />
+          </Link>
         </TopGroup>
         <Date>
           <Moment format="dddd, MMMM Do YYYY">{exp.date}</Moment>

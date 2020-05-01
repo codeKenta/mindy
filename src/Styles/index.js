@@ -23,6 +23,9 @@ const styles = {
     },
     fontSize: {
       root: '18px',
+      xs: '12px',
+      s: '14px',
+      m: '16px',
       h1: '3rem',
       h2: '1.6rem',
       h3: '1.4rem',
@@ -61,6 +64,9 @@ const styles = {
       contentStart: 'content-start',
       contentEnd: 'content-end',
     },
+  },
+  transitions: {
+    general: 'all 500ms ease-out',
   },
 }
 

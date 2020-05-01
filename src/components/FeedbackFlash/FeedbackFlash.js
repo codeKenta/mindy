@@ -1,34 +1,24 @@
 import React, { useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { useTheme } from 'emotion-theming'
 
 import styled from '@emotion/styled'
 import styles from '../../Styles'
 
 import { useExperiences } from '../../hooks/useExperiences'
-import { css } from '@emotion/core'
-import GridLoader from 'react-spinners/GridLoader'
 import CircleCheckLoader from '../Loaders/CircleCheckLoader'
 
 const FeedbackFlash = props => {
   const theme = useTheme()
 
-  const { statusNames, status, statusMessage } = useExperiences()
-
-  const isLoading = status == statusNames.fetching
+  const { statusNames, status, statusMessage, isLoading } = useExperiences()
 
   useEffect(() => {
-    console.log('FEEDBACK', { status, statusMessage, isLoading })
+    console.log('FEEDBACK', {
+      status,
+      statusMessage,
+      isLoading,
+    })
   }, [statusNames, status, statusMessage, isLoading])
-
-  const ModalOverlay = styled.div`
-    /* top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0; */
-    padding: 50px;
-    background: rgba(40, 40, 40, 0.4);
-  `
 
   const FeedbackContainer = styled.div`
     position: fixed;
@@ -44,13 +34,7 @@ const FeedbackFlash = props => {
     <FeedbackContainer>
       <h3>Feedback</h3>
       <span>{statusMessage}</span>
-      <CircleCheckLoader />
-      <GridLoader
-        //   css={override}
-        size={150}
-        color={theme.primary}
-        loading={isLoading}
-      />
+      <CircleCheckLoader loading={isLoading} />
     </FeedbackContainer>
   )
 }
