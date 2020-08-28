@@ -79,6 +79,11 @@ export const helpers = {
     padding-left: ${styles.space.xl};
     padding-right: ${styles.space.xl};
   }
+
+  @media (min-width: ${styles.breakpoints.m}) {
+    padding-left: ${styles.space.xxl};
+    padding-right: ${styles.space.xxl};
+  }
   `,
   placeContentInLayout: `
   grid-column: ${styles.gridLines.column.contentStart} / ${styles.gridLines.column.contentEnd};

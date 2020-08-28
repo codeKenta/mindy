@@ -13,12 +13,19 @@ const GlobalStyles = () => {
         }
         body {
           margin: 0;
+          font-size: ${styles.font.fontSize.s};
           font-family: ${styles.font.fontFamily.body};
           background: ${theme.background};
           color: ${theme.text};
           line-height: ${styles.font.lineHeights.body};
           letter-spacing: 0.1rem;
         }
+        @media (min-width: ${styles.breakpoints.s}) {
+          body {
+            font-size: ${styles.font.fontSize.m};
+          }
+        }
+        ,
         input,
         textarea,
         button {

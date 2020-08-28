@@ -16,11 +16,18 @@ const ExperiencesPage = () => {
 
   const Section = styled.section``
   const Experience = styled.article`
-    background: ${theme.sectionBackground};
     background: black;
-    padding: ${styles.space.l};
+    padding: ${styles.space.m};
     margin-bottom: ${styles.space.m};
+    margin-left: -${styles.space.m};
+    margin-right: -${styles.space.m};
+    @media (min-width: ${styles.breakpoints.s}) {
+      padding: ${styles.space.l};
+      margin-left: 0;
+      margin-right: 0;
+    }
   `
+
   const Date = styled.span`
     font-weight: ${styles.font.fontWeights.bold};
     display: block;
@@ -83,7 +90,7 @@ const ExperiencesPage = () => {
         : null
 
     return (
-      <Experience key={exp.date.toString()}>
+      <Experience key={exp.title + exp.date.toString()}>
         <TopGroup>
           <Heading level={2}>{exp.title}</Heading>
           <Link to={`/edit-story/${exp.docId}`}>
