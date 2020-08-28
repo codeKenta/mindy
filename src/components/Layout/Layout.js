@@ -9,10 +9,10 @@ import { helpers } from '../../Styles'
 const LayoutWrapper = styled.div`
   display: grid;
   min-height: 100vh;
-  ${helpers.useGlobalLayout};
-  grid-template-rows: [main-start] 70px [content-start] max-content [footer-start] max-content [main-end];
   ${props => `background: ${props.background}`};
 `
+/* grid-template-rows: [main-start] 70px [content-start] max-content [footer-start] max-content [main-end]; */
+/* ${helpers.useGlobalLayout}; */
 
 const Layout = ({ background, children }) => {
   return (

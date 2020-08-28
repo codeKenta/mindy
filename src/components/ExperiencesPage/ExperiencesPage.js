@@ -50,6 +50,10 @@ const ExperiencesPage = () => {
         case 'ap':
           categoryNames.push('Astral Projection')
           break
+
+        case 'obe':
+          categoryNames.push('Out-of-Body')
+          break
         case 'vd':
           categoryNames.push('Vivid Dream')
           break

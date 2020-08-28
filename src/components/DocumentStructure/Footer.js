@@ -5,16 +5,13 @@ import styles, { helpers } from '../../Styles'
 
 const StyledFooter = styled.footer`
   background: darkslateblue;
-  display: grid;
-  ${helpers.useGlobalLayout}
-  grid-column: ${styles.gridLines.column.mainStart} /
-    ${styles.gridLines.column.mainEnd};
-  grid-row: footer-start / -1;
+  ${helpers.contentWrapperPaddingX}
 `
 
 const ContentWrapper = styled.div`
   width: 100%;
-  ${helpers.placeContentInLayout}
+  max-width: ${styles.contentMaxWidth};
+  margin: 0 auto;
 `
 const Footer = () => {
   const user = useSession()

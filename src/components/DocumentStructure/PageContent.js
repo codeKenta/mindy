@@ -6,9 +6,11 @@ import styles, { helpers } from '../../Styles'
 
 const StyledPageContent = styled.div`
   width: 100%;
-  padding: ${styles.space.xl} 0;
-  place-self: center;
-  ${helpers.placeContentInLayout}
+  max-width: ${styles.contentMaxWidth};
+  margin: 0 auto;
+  padding-top: ${styles.space.xl};
+  padding-bottom: ${styles.space.xl};
+  ${helpers.contentWrapperPaddingX}
 `
 
 const PageContent = ({ children }) => {
