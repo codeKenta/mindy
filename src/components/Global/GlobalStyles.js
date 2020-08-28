@@ -25,7 +25,6 @@ const GlobalStyles = () => {
             font-size: ${styles.font.fontSize.m};
           }
         }
-        ,
         input,
         textarea,
         button {

@@ -14,6 +14,10 @@ const Heading = ({ children, className, level }) => {
     lineHeight: ${styles.font.lineHeights.heading}
     ${props.fontSize ? `font-size: ${props.fontSize};` : null}
     ${props.marginBottom && `margin-bottom: ${props.marginBottom};`}
+    @media (min-width: ${styles.breakpoints.m}) {
+      padding-left: ${styles.space.xxl};
+      padding-right: ${styles.space.xxl};
+    }
   `
   )
 
