@@ -4,7 +4,7 @@ import styled from '@emotion/styled'
 import styles, { helpers } from '../../Styles'
 import { useTheme } from 'emotion-theming'
 
-const { space, contentMaxWidth, gridLines } = styles
+const { space, contentMaxWidth } = styles
 
 const Menu = styled.ul`
   padding: 0;
@@ -18,20 +18,18 @@ const Menu = styled.ul`
 const ContentWrapper = styled.div`
   display: flex;
   width: 100%;
+  max-width: ${contentMaxWidth};
+  margin: 0 auto;
   justify-content: space-between;
-  ${helpers.placeContentInLayout}
+  align-items: center;
+  ${helpers.contentWrapperPaddingX};
 `
 const Navbar = () => {
   const theme = useTheme()
 
   const StyledNavbar = styled.nav`
-  background: ${theme.nav};
-  display: grid;
-  ${helpers.useGlobalLayout}
-  grid-column: ${gridLines.column.mainStart} /
-    ${gridLines.column.mainEnd};
-  grid-row: main-start / content-start;
-`
+    background: ${theme.nav};
+  `
 
   return (
     <StyledNavbar>

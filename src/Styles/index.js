@@ -1,4 +1,5 @@
 const styles = {
+  contentMaxWidth: '1500px',
   breakpoints: {
     xs: '500px',
     s: '600px',
@@ -50,7 +51,6 @@ const styles = {
     xl: '13px',
     xxl: '15px',
   },
-  contentMaxWidth: '1500px',
   gridLines: {
     column: {
       mainStart: 'main-start',
@@ -71,6 +71,15 @@ const styles = {
 }
 
 export const helpers = {
+  contentWrapperPaddingX: `
+  padding-left: ${styles.space.m};
+  padding-right: ${styles.space.m};
+
+  @media (min-width: ${styles.breakpoints.s}) {
+    padding-left: ${styles.space.xl};
+    padding-right: ${styles.space.xl};
+  }
+  `,
   placeContentInLayout: `
   grid-column: ${styles.gridLines.column.contentStart} / ${styles.gridLines.column.contentEnd};
     place-self: center;
