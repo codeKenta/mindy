@@ -179,7 +179,7 @@ export const useExperiences = () => {
       const deletedExperience = await db.deleteExperience(docId)
       dispatch({
         type: actionTypes.deleteExperience,
-        payload: { ...deletedExperience },
+        payload: { docId },
       })
       return deletedExperience
     } catch (error) {
@@ -245,9 +245,14 @@ const experiencesReducer = (
 
     case actionTypes.addExperience: {
       let experiences = [...state.experiences]
-      experiences.push({
+
+      console.log('exp before', experiences)
+
+      experiences.unshift({
         ...payload,
       })
+
+      console.log('exp after', experiences)
 
       return {
         ...state,
@@ -258,29 +263,33 @@ const experiencesReducer = (
     }
 
     case actionTypes.updateExperience: {
-      // let experiences = [...state.experiences]
-      // experiences.push({
-      //   ...payload,
-      // })
+      let experiences = [...state.experiences]
 
-      // UPDATE RESULT IN ARRAY
+      const foundIndex = experiences.findIndex(x => x.docId == payload.docId)
+      experiences[foundIndex] = { ...payload }
 
       return {
         ...state,
         status: statusNames.updateExperienceSuccess,
         statusMessage: 'Your story has been updated',
-        // experiences,
+        experiences,
       }
     }
 
     case actionTypes.deleteExperience: {
-      // TODO
-      // REMOVE EXP FROM STATE EXP ARRAY
+      let experiences = [...state.experiences]
+
+      console.log('Delete Exp Payload', payload)
+
+      const updatedExperiences = experiences.filter(
+        exp => exp.docId !== payload.docId
+      )
 
       return {
         ...state,
         status: statusNames.deleteExperienceSuccess,
         statusMessage: 'Your story has been deleted',
+        experiences: updatedExperiences,
       }
     }
 
