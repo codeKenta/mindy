@@ -5,7 +5,8 @@
     "env": {
       "GATSBY_DB_NAME": "@mindy-db-name",
       "GATSBY_EXPERIENCE_COLLECTION_NAME": "@mindy-experience-collection-name",
-      "GATSBY_APP_ID": "@mindy-app-id"
+      "GATSBY_APP_ID": "@mindy-app-id",
+      "DATO_CMS_TOKEN": "@mindy-dato-cms-token"
     }
   }
 }

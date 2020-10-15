@@ -1,81 +1,54 @@
 import React from 'react'
 import Moment from 'react-moment'
+import { graphql, useStaticQuery, Link } from 'gatsby'
 import { useExperiences } from '../../hooks/useExperiences'
-import { useTheme } from 'emotion-theming'
 import Heading from '../Elements/Heading'
-import styled from '@emotion/styled'
+
 import ReactMarkdown from 'react-markdown'
-import styles from '../../Styles'
-import { Link } from '@reach/router'
 import EditIcon from '@material-ui/icons/Edit'
+import styledComps from './styledComps'
 
 const ExperiencesPage = () => {
   const { experiences } = useExperiences()
 
-  const theme = useTheme()
+  const [
+    Section,
+    Experience,
+    DateText,
+    Categories,
+    TopGroup,
+    Story,
+  ] = styledComps
 
-  const Section = styled.section``
-  const Experience = styled.article`
-    background: black;
-    padding: ${styles.space.m};
-    margin-bottom: ${styles.space.m};
-    margin-left: -${styles.space.m};
-    margin-right: -${styles.space.m};
-    @media (min-width: ${styles.breakpoints.s}) {
-      padding: ${styles.space.l};
-      margin-left: 0;
-      margin-right: 0;
-    }
-  `
+  const { allDatoCmsCategory } = useStaticQuery(
+    graphql`
+      query {
+        allDatoCmsCategory {
+          categories: nodes {
+            short: categoryShort
+            name: categoryName
+          }
+        }
+      }
+    `
+  )
 
-  const Date = styled.span`
-    font-weight: ${styles.font.fontWeights.bold};
-    display: block;
-  `
-  const Categories = styled.span`
-    display: block;
-    font-style: italic;
-  `
+  const buildCategoriesSwitch = () => {
+    let obj = {}
 
-  const TopGroup = styled.div`
-    display: flex;
-    justify-content: space-between;
-  `
+    allDatoCmsCategory.categories.forEach(({ short, name }) => {
+      obj[short] = name
+    })
+    return obj
+  }
 
-  const Story = styled.p``
+  const cagegoriesSwitch = buildCategoriesSwitch()
+
   const buildCategoriesString = categories => {
     let categoryNames = []
 
     categories.forEach(category => {
-      switch (category) {
-        case 'd':
-          categoryNames.push('Dream')
-          break
-        case 'ld':
-          categoryNames.push('Lucid Dream')
-          break
-        case 'ap':
-          categoryNames.push('Astral Projection')
-          break
-
-        case 'obe':
-          categoryNames.push('Out-of-Body')
-          break
-        case 'vd':
-          categoryNames.push('Vivid Dream')
-          break
-        case 'sp':
-          categoryNames.push('Sleep paralysis')
-          break
-        case 'm':
-          categoryNames.push('Meditation')
-          break
-        case 'other':
-          categoryNames.push('Other')
-          break
-        default:
-          break
-      }
+      categoryNames.push(cagegoriesSwitch[category])
     })
 
     return categoryNames.join(', ')
@@ -97,9 +70,9 @@ const ExperiencesPage = () => {
             <EditIcon color="primary" />
           </Link>
         </TopGroup>
-        <Date>
+        <DateText>
           <Moment format="dddd, MMMM Do YYYY">{exp.date}</Moment>
-        </Date>
+        </DateText>
         <Categories>{buildCategoriesString(exp.categories)}</Categories>
         <Story>{storyPureText}</Story>
         {!storyPureText && <ReactMarkdown source={storyTextAsMarkdown} />}

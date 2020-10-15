@@ -3,10 +3,8 @@ import { useSession } from '../Firebase/Auth/Auth'
 import useStorage from '../Firebase/storage'
 
 import db from '../Firebase/db'
-import { navigate } from 'gatsby'
-const ExperiencesContext = React.createContext(null)
 
-// const statusMessages = {}
+const ExperiencesContext = React.createContext(null)
 
 const actionTypes = {
   fetchStart: 'FETCH_START',
@@ -265,7 +263,7 @@ const experiencesReducer = (
     case actionTypes.updateExperience: {
       let experiences = [...state.experiences]
 
-      const foundIndex = experiences.findIndex(x => x.docId == payload.docId)
+      const foundIndex = experiences.findIndex(x => x.docId === payload.docId)
       experiences[foundIndex] = { ...payload }
 
       return {
@@ -294,7 +292,7 @@ const experiencesReducer = (
     }
 
     default: {
-      console.error(`Received invalid todo action type: ${type}`)
+      console.error(`Received invalid action type: ${type}`)
     }
   }
 }
