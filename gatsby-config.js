@@ -33,6 +33,14 @@ module.exports = {
       },
     },
     {
+      resolve: `gatsby-source-datocms`,
+      options: {
+        apiToken: process.env.DATO_CMS_TOKEN,
+        previewMode: false,
+        disableLiveReload: false,
+      },
+    },
+    {
       resolve: `gatsby-plugin-google-fonts`,
       options: {
         fonts: [
