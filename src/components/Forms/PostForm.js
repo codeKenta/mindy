@@ -241,7 +241,7 @@ const PostForm = ({ docId }) => {
               )}
             </Field>
 
-            {/* <FormGroup className="story">
+            <FormGroup className="story">
               <Label htmlFor="story">Story</Label>
 
               <Editor
@@ -272,44 +272,6 @@ const PostForm = ({ docId }) => {
                     ordered: { className: 'story-list-ol' },
                   },
                 }}
-              />
-            </FormGroup> */}
-
-            <FormGroup className="story">
-              <Label htmlFor="story">Story</Label>
-              <Field
-                name="story-editor"
-                render={({ input }) => (
-                  <Editor
-                    editorState={editorState}
-                    wrapperClassName="demo-wrapper"
-                    editorClassName="demo-editor"
-                    onEditorStateChange={onEditorStateChange}
-                    stripPastedStyles={true}
-                    toolbar={{
-                      options: ['inline', 'blockType', 'list', 'history'],
-                      inline: {
-                        inDropdown: false,
-                        className: 'story-inline',
-                        options: ['bold', 'italic'],
-                        bold: { className: 'story-inline--bold' },
-                        italic: { className: 'story-inline--italic' },
-                      },
-                      blockType: {
-                        inDropdown: true,
-                        options: ['Normal', 'H2', 'H3'],
-                        className: 'story-block_type',
-                      },
-                      list: {
-                        inDropdown: false,
-                        className: 'story-list',
-                        options: ['unordered', 'ordered'],
-                        unordered: { className: 'story-list-ul' },
-                        ordered: { className: 'story-list-ol' },
-                      },
-                    }}
-                  />
-                )}
               />
             </FormGroup>
 
