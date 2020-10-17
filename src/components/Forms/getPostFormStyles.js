@@ -139,7 +139,7 @@ const getPostFormStyles = theme => {
     justify-content: center;
   `
 
-  return [
+  return {
     Label,
     FormGroup,
     CheckBoxWrapper,
@@ -148,7 +148,7 @@ const getPostFormStyles = theme => {
     ImagesContainer,
     HasDraftInfo,
     DeleteExperienceSection,
-  ]
+  }
 }
 
 export default getPostFormStyles

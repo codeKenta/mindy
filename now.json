@@ -1,6 +1,9 @@
 {
   "name": "mindy",
   "version": 2,
+  "engines": {
+    "node": "12.x"
+  },
   "build": {
     "env": {
       "GATSBY_DB_NAME": "@mindy-db-name",

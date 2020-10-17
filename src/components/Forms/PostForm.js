@@ -36,7 +36,7 @@ const PostForm = ({ docId }) => {
   )
 
   const theme = useTheme()
-  const [
+  const {
     Label,
     FormGroup,
     CheckBoxWrapper,
@@ -45,7 +45,7 @@ const PostForm = ({ docId }) => {
     ImagesContainer,
     HasDraftInfo,
     DeleteExperienceSection,
-  ] = getPostFormStyles(theme)
+  } = getPostFormStyles(theme)
 
   const { uid: userId } = useSession()
 
