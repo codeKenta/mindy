@@ -30,4 +30,4 @@ const TopGroup = styled.div`
 
 const Story = styled.p``
 
-export default [Section, Experience, DateText, Categories, TopGroup, Story]
+export default { Section, Experience, DateText, Categories, TopGroup, Story }

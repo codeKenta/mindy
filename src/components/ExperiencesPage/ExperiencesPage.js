@@ -6,19 +6,19 @@ import Heading from '../Elements/Heading'
 
 import ReactMarkdown from 'react-markdown'
 import EditIcon from '@material-ui/icons/Edit'
-import styledComps from './styledComps'
+import experiencePageStyles from './experiencePageStyles'
 
 const ExperiencesPage = () => {
   const { experiences } = useExperiences()
 
-  const [
+  const {
     Section,
     Experience,
     DateText,
     Categories,
     TopGroup,
     Story,
-  ] = styledComps
+  } = experiencePageStyles
 
   const { allDatoCmsCategory } = useStaticQuery(
     graphql`
