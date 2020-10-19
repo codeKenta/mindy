@@ -12,14 +12,6 @@ const FeedbackFlash = props => {
 
   const { statusNames, status, statusMessage, isLoading } = useExperiences()
 
-  useEffect(() => {
-    console.log('FEEDBACK', {
-      status,
-      statusMessage,
-      isLoading,
-    })
-  }, [statusNames, status, statusMessage, isLoading])
-
   const FeedbackContainer = styled.div`
     position: fixed;
     z-index: 1000;
