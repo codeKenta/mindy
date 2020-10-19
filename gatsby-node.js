@@ -1,13 +1,26 @@
-// Implement the Gatsby API “onCreatePage”. This is
-// called after every page is created.
-exports.onCreatePage = ({ page, actions }) => {
+const path = require(`path`)
+
+exports.createPages = async ({ actions }) => {
   const { createPage } = actions
-  // Make the front page match everything client side.
-  // Normally your paths should be a bit more judicious.
-  if (page.path === `/`) {
-    page.matchPath = `/*`
-    createPage(page)
-  }
+
+  createPage({
+    path: `/`,
+    component: path.resolve(`./src/templates/index.js`),
+  })
+
+  const postFormComponentPath = path.resolve(`./src/templates/postFormPage.js`)
+
+  createPage({
+    path: `/new-story`,
+    component: postFormComponentPath,
+    // context: { locale: page.locale },
+  })
+
+  createPage({
+    path: `/edit-story/`,
+    matchPath: '/edit-story/:docId',
+    component: postFormComponentPath,
+  })
 }
 
 exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {

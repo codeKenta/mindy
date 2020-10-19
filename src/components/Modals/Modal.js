@@ -16,10 +16,6 @@ const Modal = props => {
 
   const isLoading = status == statusNames.fetching
 
-  useEffect(() => {
-    console.log('MODAL', { status, statusMessage, isLoading })
-  }, [statusNames, status, statusMessage, isLoading])
-
   const ModalOverlay = styled.div`
     position: fixed;
     z-index: 1000;

@@ -97,7 +97,6 @@ const PostForm = ({ docId }) => {
         })
 
         if (exp.images) {
-          console.log('IF IMAGES in init postform')
           setImages(exp.images)
         }
 
@@ -148,7 +147,6 @@ const PostForm = ({ docId }) => {
 
   const onSubmit = async formInputs => {
     setShowFeedback(true)
-    console.log('formInputs', formInputs)
     const { title, categories } = formInputs
     const date = formInputs.date
       ? new Date(formInputs.date).toISOString()
@@ -294,32 +292,27 @@ const PostForm = ({ docId }) => {
               <CategoriesContainer>
                 {Array.isArray(categories) &&
                   categories.length > 0 &&
-                  categories.map(
-                    ({ short, name }) => (
-                      console.log(short, name),
-                      (
-                        <CheckBoxWrapper>
-                          <Field
-                            type="checkbox"
-                            name="categories"
-                            value={short}
-                            initialValue={initialFormValues.categories.includes(
-                              short
-                            )}
-                            render={({ input }) => (
-                              <CheckBoxWrapper>
-                                <span>{name}</span>
-                                <CheckField>
-                                  {input.checked && <CheckIcon />}
-                                  <input {...input} />
-                                </CheckField>
-                              </CheckBoxWrapper>
-                            )}
-                          />
-                        </CheckBoxWrapper>
-                      )
-                    )
-                  )}
+                  categories.map(({ short, name }) => (
+                    <CheckBoxWrapper key={name}>
+                      <Field
+                        type="checkbox"
+                        name="categories"
+                        value={short}
+                        initialValue={initialFormValues.categories.includes(
+                          short
+                        )}
+                        render={({ input }) => (
+                          <CheckBoxWrapper>
+                            <span>{name}</span>
+                            <CheckField>
+                              {input.checked && <CheckIcon />}
+                              <input {...input} />
+                            </CheckField>
+                          </CheckBoxWrapper>
+                        )}
+                      />
+                    </CheckBoxWrapper>
+                  ))}
               </CategoriesContainer>
             </FormGroup>
 
