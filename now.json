@@ -2,7 +2,7 @@
   "name": "mindy",
   "version": 2,
   "engines": {
-    "node": "12.x"
+    "node": "12.1.6"
   },
   "build": {
     "env": {
