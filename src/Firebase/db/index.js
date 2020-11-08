@@ -14,21 +14,58 @@ export default {
       throw error
     }
   },
-  getExperiences: async uid => {
-    return db
-      .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
-      .where('uid', '==', uid)
-      .orderBy('date', 'desc')
-      .get()
-      .then(querySnapshot => {
-        const data = querySnapshot.docs.map(doc => {
+  getExperiences: async (uid, nextQuery) => {
+    const LIMIT = 20
+    if (nextQuery) {
+      return nextQuery.get().then(function(documentSnapshots) {
+        const lastVisible =
+          documentSnapshots.docs[documentSnapshots.docs.length - 1]
+
+        const data = documentSnapshots.docs.map(doc => {
           return {
             ...doc.data(),
             docId: doc.id,
           }
         })
-        return data
+
+        const next = db
+          .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
+          .where('uid', '==', uid)
+          .orderBy('date', 'desc')
+          .startAfter(lastVisible)
+          .limit(LIMIT)
+
+        return { experiences: data, nextQuery: next }
       })
+    }
+
+    const first = db
+      .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
+      .where('uid', '==', uid)
+      .orderBy('date', 'desc')
+      .limit(LIMIT)
+
+    return first.get().then(function(documentSnapshots) {
+      const lastVisible =
+        documentSnapshots.docs[documentSnapshots.docs.length - 1]
+
+      const data = documentSnapshots.docs.map(doc => {
+        return {
+          ...doc.data(),
+          docId: doc.id,
+        }
+      })
+
+      const next = db
+        .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
+        .where('uid', '==', uid)
+        .orderBy('date', 'desc')
+        .startAfter(lastVisible)
+        .limit(LIMIT)
+
+      // Todo: Save next cursor or return it so we can use save it in state
+      return { experiences: data, nextQuery: next }
+    })
   },
 
   getExperience: async docId => {

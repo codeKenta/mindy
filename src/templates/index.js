@@ -12,8 +12,6 @@ const IndexPage = () => {
     <Layout background={theme.sectionBackground}>
       <AuthRequired>
         <ExperiencesPage />
-        {/* <StoryFormPage path="/new-story" />
-          <StoryFormPage path="/edit-story/:docId" /> */}
       </AuthRequired>
     </Layout>
   )

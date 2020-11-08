@@ -42,11 +42,11 @@ export const ExperiencesProvider = ({ children }) => {
         statusMessage: 'Loading stories',
       })
       try {
-        const experiences = await db.getExperiences(user.uid)
+        const { experiences, nextQuery } = await db.getExperiences(user.uid)
 
         dispatch({
           type: actionTypes.getExperiences,
-          payload: { experiences },
+          payload: { experiences, nextQuery },
         })
       } catch (error) {
         dispatch({
@@ -55,7 +55,6 @@ export const ExperiencesProvider = ({ children }) => {
             message: 'Failed to load the stories',
           },
         })
-        console.log('error add exp', error)
       }
     }
 
@@ -102,6 +101,7 @@ export const useExperiences = () => {
 
   const getExperience = async docId => {
     fetchStart()
+
     try {
       const experience = await db.getExperience(docId)
       fetchEnd(statusNames.getExperienceSuccess)
@@ -110,7 +110,31 @@ export const useExperiences = () => {
     } catch (error) {
       errorOccured('The experience could not be fetched')
       // navigate('/')
-      console.log('error get experience', error)
+    }
+  }
+
+  const getExperiences = async () => {
+    dispatch({
+      type: actionTypes.fetchStart,
+      statusMessage: 'Loading stories',
+    })
+    try {
+      const { experiences, nextQuery } = await db.getExperiences(
+        user.uid,
+        state.nextQuery
+      )
+
+      dispatch({
+        type: actionTypes.getExperiences,
+        payload: { experiences, nextQuery },
+      })
+    } catch (error) {
+      dispatch({
+        type: actionTypes.errorOccured,
+        payload: {
+          message: 'Failed to load the stories',
+        },
+      })
     }
   }
 
@@ -137,8 +161,6 @@ export const useExperiences = () => {
       return savedExperience
     } catch (error) {
       errorOccured('The story could not be saved')
-      console.log('error add exp', error)
-      throw Error(error)
     }
   }
 
@@ -168,8 +190,6 @@ export const useExperiences = () => {
     }
   }
 
-  // TODO:! Save new and edited stories to state correct so we dont need to fetch new data to se updates
-
   const deleteExperience = async docId => {
     fetchStart('Deleting your story')
 
@@ -194,6 +214,7 @@ export const useExperiences = () => {
     actions: {
       addExperience,
       getExperience,
+      getExperiences,
       updateExperience,
       deleteExperience,
     },
@@ -221,9 +242,6 @@ const experiencesReducer = (
       }
     }
 
-    /*
-    Maybe have error in separate obj
-    */
     case actionTypes.errorOccured: {
       return {
         ...state,
@@ -233,9 +251,11 @@ const experiencesReducer = (
     }
 
     case actionTypes.getExperiences: {
+      const experiences = state.experiences.concat(payload.experiences || [])
       return {
         ...state,
-        experiences: payload.experiences || [],
+        experiences: experiences,
+        nextQuery: payload.nextQuery || null,
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,
       }
@@ -244,13 +264,9 @@ const experiencesReducer = (
     case actionTypes.addExperience: {
       let experiences = [...state.experiences]
 
-      console.log('exp before', experiences)
-
       experiences.unshift({
         ...payload,
       })
-
-      console.log('exp after', experiences)
 
       return {
         ...state,
@@ -277,8 +293,6 @@ const experiencesReducer = (
     case actionTypes.deleteExperience: {
       let experiences = [...state.experiences]
 
-      console.log('Delete Exp Payload', payload)
-
       const updatedExperiences = experiences.filter(
         exp => exp.docId !== payload.docId
       )
@@ -296,3 +310,9 @@ const experiencesReducer = (
     }
   }
 }
+
+/*
+
+
+
+*/

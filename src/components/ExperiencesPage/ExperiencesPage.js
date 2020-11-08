@@ -9,7 +9,10 @@ import EditIcon from '@material-ui/icons/Edit'
 import experiencePageStyles from './experiencePageStyles'
 
 const ExperiencesPage = () => {
-  const { experiences } = useExperiences()
+  const {
+    experiences,
+    actions: { getExperiences },
+  } = useExperiences()
 
   const {
     Section,
@@ -83,6 +86,7 @@ const ExperiencesPage = () => {
     <Section>
       <Heading level={1}>Your experiences</Heading>
       {renderExperiences}
+      <button onClick={getExperiences}> load more</button>
     </Section>
   )
 }
