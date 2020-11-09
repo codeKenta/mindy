@@ -28,6 +28,40 @@ export default {
           }
         })
 
+        let next
+        if (data.length !== 0) {
+          next = db
+            .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
+            .where('uid', '==', uid)
+            .orderBy('date', 'desc')
+            .startAfter(lastVisible)
+            .limit(LIMIT)
+        }
+
+        return {
+          experiences: data,
+          nextQuery: next || null,
+          isOutOfQueries: data.length === 0,
+        }
+      })
+    } else {
+      const first = db
+        .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
+        .where('uid', '==', uid)
+        .orderBy('date', 'desc')
+        .limit(LIMIT)
+
+      return first.get().then(function(documentSnapshots) {
+        const lastVisible =
+          documentSnapshots.docs[documentSnapshots.docs.length - 1]
+
+        const data = documentSnapshots.docs.map(doc => {
+          return {
+            ...doc.data(),
+            docId: doc.id,
+          }
+        })
+
         const next = db
           .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
           .where('uid', '==', uid)
@@ -38,33 +72,6 @@ export default {
         return { experiences: data, nextQuery: next }
       })
     }
-
-    const first = db
-      .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
-      .where('uid', '==', uid)
-      .orderBy('date', 'desc')
-      .limit(LIMIT)
-
-    return first.get().then(function(documentSnapshots) {
-      const lastVisible =
-        documentSnapshots.docs[documentSnapshots.docs.length - 1]
-
-      const data = documentSnapshots.docs.map(doc => {
-        return {
-          ...doc.data(),
-          docId: doc.id,
-        }
-      })
-
-      const next = db
-        .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
-        .where('uid', '==', uid)
-        .orderBy('date', 'desc')
-        .startAfter(lastVisible)
-        .limit(LIMIT)
-
-      return { experiences: data, nextQuery: next }
-    })
   },
 
   getExperience: async docId => {

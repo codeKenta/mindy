@@ -3,14 +3,18 @@ import Moment from 'react-moment'
 import { graphql, useStaticQuery, Link } from 'gatsby'
 import { useExperiences } from '../../hooks/useExperiences'
 import Heading from '../Elements/Heading'
+import PlaceholderFeed from '../PlaceholderFeed/PlaceholderFeed'
 
 import ReactMarkdown from 'react-markdown'
 import EditIcon from '@material-ui/icons/Edit'
+import Inview from '../Inview/Inview'
 import experiencePageStyles from './experiencePageStyles'
 
 const ExperiencesPage = () => {
   const {
     shownExperiences,
+    firstLoadCompleted,
+    isLoading,
     actions: { getExperiences },
   } = useExperiences()
 
@@ -86,7 +90,8 @@ const ExperiencesPage = () => {
     <Section>
       <Heading level={1}>Your experiences</Heading>
       {renderExperiences}
-      <button onClick={getExperiences}> load more</button>
+      {isLoading && <PlaceholderFeed />}
+      {firstLoadCompleted && <Inview triggerFunction={getExperiences} />}
     </Section>
   )
 }

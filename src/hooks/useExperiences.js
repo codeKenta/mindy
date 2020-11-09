@@ -32,6 +32,9 @@ export const ExperiencesProvider = ({ children }) => {
   const [state, dispatch] = useReducer(experiencesReducer, {
     loadedExperiences: [],
     shownExperiences: [],
+    firstLoadCompleted: false,
+    nextQuery: null,
+    isOutOfQueries: false,
     status: null,
     statusMessage: null,
   })
@@ -46,14 +49,23 @@ export const ExperiencesProvider = ({ children }) => {
         statusMessage: 'Loading stories',
       })
       try {
-        const { experiences, nextQuery } = await db.getExperiences(user.uid)
+        const {
+          experiences,
+          nextQuery,
+          isOutOfQueries,
+        } = await db.getExperiences(user.uid)
 
         let loadedExperiences = [...experiences]
         let shownExperiences = loadedExperiences.splice(0, SHOW_CHUNK_SIZE)
 
         dispatch({
           type: actionTypes.getExperiences,
-          payload: { loadedExperiences, shownExperiences, nextQuery },
+          payload: {
+            loadedExperiences,
+            shownExperiences,
+            nextQuery,
+            isOutOfQueries,
+          },
         })
       } catch (error) {
         dispatch({
@@ -121,26 +133,32 @@ export const useExperiences = () => {
   }
 
   const getExperiences = async () => {
-    // TODO: If no loaded, get more from DB
-    // Else- show more from the loaded
-
     if (state.loadedExperiences.length === 0) {
+      if (state.isOutOfQueries) {
+        return
+      }
       dispatch({
         type: actionTypes.fetchStart,
         statusMessage: 'Loading stories',
       })
       try {
-        const { experiences, nextQuery } = await db.getExperiences(
-          user.uid,
-          state.nextQuery
-        )
+        const {
+          experiences,
+          nextQuery,
+          isOutOfQueries,
+        } = await db.getExperiences(user.uid, state.nextQuery)
 
         let loadedExperiences = [...experiences]
         let shownExperiences = loadedExperiences.splice(0, SHOW_CHUNK_SIZE)
 
         dispatch({
           type: actionTypes.getExperiences,
-          payload: { loadedExperiences, shownExperiences, nextQuery },
+          payload: {
+            loadedExperiences,
+            shownExperiences,
+            nextQuery,
+            isOutOfQueries,
+          },
         })
       } catch (error) {
         dispatch({
@@ -231,6 +249,7 @@ export const useExperiences = () => {
     statusMessage: state.statusMessage,
     statusNames,
     isLoading: state.status === statusNames.fetching,
+    firstLoadCompleted: state.firstLoadCompleted,
     actions: {
       addExperience,
       getExperience,
@@ -271,8 +290,6 @@ const experiencesReducer = (
     }
 
     case actionTypes.getExperiences: {
-      debugger
-
       let shownInState = [...state.shownExperiences]
       let loadedInState = [...state.loadedExperiences]
 
@@ -282,15 +299,15 @@ const experiencesReducer = (
       const shownExperiences = shownInState.concat(experiencesToShow)
       const loadedExperiences = loadedInState.concat(newLoaded)
 
-      debugger
-
       return {
         ...state,
         loadedExperiences: loadedExperiences,
         shownExperiences: shownExperiences,
         nextQuery: payload.nextQuery || null,
+        isOutOfQueries: payload.isOutOfQueries,
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,
+        firstLoadCompleted: true,
       }
     }
 
