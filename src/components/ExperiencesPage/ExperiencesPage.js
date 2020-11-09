@@ -10,7 +10,7 @@ import experiencePageStyles from './experiencePageStyles'
 
 const ExperiencesPage = () => {
   const {
-    experiences,
+    shownExperiences,
     actions: { getExperiences },
   } = useExperiences()
 
@@ -57,7 +57,7 @@ const ExperiencesPage = () => {
     return categoryNames.join(', ')
   }
 
-  const renderExperiences = experiences.map(exp => {
+  const renderExperiences = shownExperiences.map(exp => {
     const storyPureText = typeof exp.story === 'string' ? exp.story : null
 
     const storyTextAsMarkdown =

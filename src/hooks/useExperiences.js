@@ -4,6 +4,7 @@ import useStorage from '../Firebase/storage'
 
 import db from '../Firebase/db'
 
+const SHOW_CHUNK_SIZE = 5
 const ExperiencesContext = React.createContext(null)
 
 const actionTypes = {
@@ -14,6 +15,7 @@ const actionTypes = {
   getExperiences: 'GET_EXPERIENCES',
   getExperience: 'GET_EXPERIENCE',
   deleteExperience: 'DELETE_EXPERIENCE',
+  showMoreLoadedExperiences: 'SHOW_MORE_LOADED_EXPERIENCES',
 }
 
 const statusNames = {
@@ -28,7 +30,8 @@ const statusNames = {
 
 export const ExperiencesProvider = ({ children }) => {
   const [state, dispatch] = useReducer(experiencesReducer, {
-    experiences: [],
+    loadedExperiences: [],
+    shownExperiences: [],
     status: null,
     statusMessage: null,
   })
@@ -36,6 +39,7 @@ export const ExperiencesProvider = ({ children }) => {
   const user = useSession()
 
   React.useEffect(() => {
+    // TODO: Move actions out of scope so it can be reused
     const getExperiences = async () => {
       dispatch({
         type: actionTypes.fetchStart,
@@ -44,9 +48,12 @@ export const ExperiencesProvider = ({ children }) => {
       try {
         const { experiences, nextQuery } = await db.getExperiences(user.uid)
 
+        let loadedExperiences = [...experiences]
+        let shownExperiences = loadedExperiences.splice(0, SHOW_CHUNK_SIZE)
+
         dispatch({
           type: actionTypes.getExperiences,
-          payload: { experiences, nextQuery },
+          payload: { loadedExperiences, shownExperiences, nextQuery },
         })
       } catch (error) {
         dispatch({
@@ -114,26 +121,38 @@ export const useExperiences = () => {
   }
 
   const getExperiences = async () => {
-    dispatch({
-      type: actionTypes.fetchStart,
-      statusMessage: 'Loading stories',
-    })
-    try {
-      const { experiences, nextQuery } = await db.getExperiences(
-        user.uid,
-        state.nextQuery
-      )
+    // TODO: If no loaded, get more from DB
+    // Else- show more from the loaded
 
+    if (state.loadedExperiences.length === 0) {
       dispatch({
-        type: actionTypes.getExperiences,
-        payload: { experiences, nextQuery },
+        type: actionTypes.fetchStart,
+        statusMessage: 'Loading stories',
       })
-    } catch (error) {
+      try {
+        const { experiences, nextQuery } = await db.getExperiences(
+          user.uid,
+          state.nextQuery
+        )
+
+        let loadedExperiences = [...experiences]
+        let shownExperiences = loadedExperiences.splice(0, SHOW_CHUNK_SIZE)
+
+        dispatch({
+          type: actionTypes.getExperiences,
+          payload: { loadedExperiences, shownExperiences, nextQuery },
+        })
+      } catch (error) {
+        dispatch({
+          type: actionTypes.errorOccured,
+          payload: {
+            message: 'Failed to load the stories',
+          },
+        })
+      }
+    } else {
       dispatch({
-        type: actionTypes.errorOccured,
-        payload: {
-          message: 'Failed to load the stories',
-        },
+        type: actionTypes.showMoreLoadedExperiences,
       })
     }
   }
@@ -207,6 +226,7 @@ export const useExperiences = () => {
 
   return {
     experiences: state.experiences,
+    shownExperiences: state.shownExperiences,
     status: state.status,
     statusMessage: state.statusMessage,
     statusNames,
@@ -251,20 +271,48 @@ const experiencesReducer = (
     }
 
     case actionTypes.getExperiences: {
-      const experiences = state.experiences.concat(payload.experiences || [])
+      debugger
+
+      let shownInState = [...state.shownExperiences]
+      let loadedInState = [...state.loadedExperiences]
+
+      const newLoaded = [...payload.loadedExperiences] || []
+      const experiencesToShow = [...payload.shownExperiences] || []
+
+      const shownExperiences = shownInState.concat(experiencesToShow)
+      const loadedExperiences = loadedInState.concat(newLoaded)
+
+      debugger
+
       return {
         ...state,
-        experiences: experiences,
+        loadedExperiences: loadedExperiences,
+        shownExperiences: shownExperiences,
         nextQuery: payload.nextQuery || null,
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,
       }
     }
 
-    case actionTypes.addExperience: {
-      let experiences = [...state.experiences]
+    case actionTypes.showMoreLoadedExperiences: {
+      const loaded = [...state.loadedExperiences]
+      let shown = [...state.shownExperiences]
 
-      experiences.unshift({
+      shown = shown.concat(loaded.splice(0, SHOW_CHUNK_SIZE))
+
+      return {
+        ...state,
+        shownExperiences: shown,
+        loadedExperiences: loaded,
+        status: statusNames.updateExperienceSuccess,
+        statusMessage: 'Your story has been updated',
+      }
+    }
+
+    case actionTypes.addExperience: {
+      let shownExperiences = [...state.shownExperiences]
+
+      shownExperiences.unshift({
         ...payload,
       })
 
@@ -272,28 +320,30 @@ const experiencesReducer = (
         ...state,
         status: statusNames.addExperienceSuccess,
         statusMessage: 'Your story has been saved',
-        experiences,
+        shownExperiences,
       }
     }
 
     case actionTypes.updateExperience: {
-      let experiences = [...state.experiences]
+      let shownExperiences = [...state.shownExperiences]
 
-      const foundIndex = experiences.findIndex(x => x.docId === payload.docId)
-      experiences[foundIndex] = { ...payload }
+      const foundIndex = shownExperiences.findIndex(
+        x => x.docId === payload.docId
+      )
+      shownExperiences[foundIndex] = { ...payload }
 
       return {
         ...state,
         status: statusNames.updateExperienceSuccess,
         statusMessage: 'Your story has been updated',
-        experiences,
+        shownExperiences,
       }
     }
 
     case actionTypes.deleteExperience: {
-      let experiences = [...state.experiences]
+      let shownExperiences = [...state.shownExperiences]
 
-      const updatedExperiences = experiences.filter(
+      const updatedExperiences = shownExperiences.filter(
         exp => exp.docId !== payload.docId
       )
 
@@ -301,7 +351,7 @@ const experiencesReducer = (
         ...state,
         status: statusNames.deleteExperienceSuccess,
         statusMessage: 'Your story has been deleted',
-        experiences: updatedExperiences,
+        shownExperiences: updatedExperiences,
       }
     }
 

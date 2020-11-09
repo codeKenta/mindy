@@ -63,7 +63,6 @@ export default {
         .startAfter(lastVisible)
         .limit(LIMIT)
 
-      // Todo: Save next cursor or return it so we can use save it in state
       return { experiences: data, nextQuery: next }
     })
   },
