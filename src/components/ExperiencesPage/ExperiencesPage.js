@@ -3,13 +3,20 @@ import Moment from 'react-moment'
 import { graphql, useStaticQuery, Link } from 'gatsby'
 import { useExperiences } from '../../hooks/useExperiences'
 import Heading from '../Elements/Heading'
+import PlaceholderFeed from '../PlaceholderFeed/PlaceholderFeed'
 
 import ReactMarkdown from 'react-markdown'
 import EditIcon from '@material-ui/icons/Edit'
+import Inview from '../Inview/Inview'
 import experiencePageStyles from './experiencePageStyles'
 
 const ExperiencesPage = () => {
-  const { experiences } = useExperiences()
+  const {
+    shownExperiences,
+    firstLoadCompleted,
+    isLoading,
+    actions: { getExperiences },
+  } = useExperiences()
 
   const {
     Section,
@@ -54,7 +61,7 @@ const ExperiencesPage = () => {
     return categoryNames.join(', ')
   }
 
-  const renderExperiences = experiences.map(exp => {
+  const renderExperiences = shownExperiences.map(exp => {
     const storyPureText = typeof exp.story === 'string' ? exp.story : null
 
     const storyTextAsMarkdown =
@@ -83,6 +90,8 @@ const ExperiencesPage = () => {
     <Section>
       <Heading level={1}>Your experiences</Heading>
       {renderExperiences}
+      {isLoading && <PlaceholderFeed />}
+      {firstLoadCompleted && <Inview triggerFunction={getExperiences} />}
     </Section>
   )
 }

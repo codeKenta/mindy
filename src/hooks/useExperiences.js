@@ -4,6 +4,7 @@ import useStorage from '../Firebase/storage'
 
 import db from '../Firebase/db'
 
+const SHOW_CHUNK_SIZE = 5
 const ExperiencesContext = React.createContext(null)
 
 const actionTypes = {
@@ -14,6 +15,7 @@ const actionTypes = {
   getExperiences: 'GET_EXPERIENCES',
   getExperience: 'GET_EXPERIENCE',
   deleteExperience: 'DELETE_EXPERIENCE',
+  showMoreLoadedExperiences: 'SHOW_MORE_LOADED_EXPERIENCES',
 }
 
 const statusNames = {
@@ -28,7 +30,11 @@ const statusNames = {
 
 export const ExperiencesProvider = ({ children }) => {
   const [state, dispatch] = useReducer(experiencesReducer, {
-    experiences: [],
+    loadedExperiences: [],
+    shownExperiences: [],
+    firstLoadCompleted: false,
+    nextQuery: null,
+    isOutOfQueries: false,
     status: null,
     statusMessage: null,
   })
@@ -36,17 +42,30 @@ export const ExperiencesProvider = ({ children }) => {
   const user = useSession()
 
   React.useEffect(() => {
+    // TODO: Move actions out of scope so it can be reused
     const getExperiences = async () => {
       dispatch({
         type: actionTypes.fetchStart,
         statusMessage: 'Loading stories',
       })
       try {
-        const experiences = await db.getExperiences(user.uid)
+        const {
+          experiences,
+          nextQuery,
+          isOutOfQueries,
+        } = await db.getExperiences(user.uid)
+
+        let loadedExperiences = [...experiences]
+        let shownExperiences = loadedExperiences.splice(0, SHOW_CHUNK_SIZE)
 
         dispatch({
           type: actionTypes.getExperiences,
-          payload: { experiences },
+          payload: {
+            loadedExperiences,
+            shownExperiences,
+            nextQuery,
+            isOutOfQueries,
+          },
         })
       } catch (error) {
         dispatch({
@@ -55,7 +74,6 @@ export const ExperiencesProvider = ({ children }) => {
             message: 'Failed to load the stories',
           },
         })
-        console.log('error add exp', error)
       }
     }
 
@@ -102,6 +120,7 @@ export const useExperiences = () => {
 
   const getExperience = async docId => {
     fetchStart()
+
     try {
       const experience = await db.getExperience(docId)
       fetchEnd(statusNames.getExperienceSuccess)
@@ -110,7 +129,49 @@ export const useExperiences = () => {
     } catch (error) {
       errorOccured('The experience could not be fetched')
       // navigate('/')
-      console.log('error get experience', error)
+    }
+  }
+
+  const getExperiences = async () => {
+    if (state.loadedExperiences.length === 0) {
+      if (state.isOutOfQueries) {
+        return
+      }
+      dispatch({
+        type: actionTypes.fetchStart,
+        statusMessage: 'Loading stories',
+      })
+      try {
+        const {
+          experiences,
+          nextQuery,
+          isOutOfQueries,
+        } = await db.getExperiences(user.uid, state.nextQuery)
+
+        let loadedExperiences = [...experiences]
+        let shownExperiences = loadedExperiences.splice(0, SHOW_CHUNK_SIZE)
+
+        dispatch({
+          type: actionTypes.getExperiences,
+          payload: {
+            loadedExperiences,
+            shownExperiences,
+            nextQuery,
+            isOutOfQueries,
+          },
+        })
+      } catch (error) {
+        dispatch({
+          type: actionTypes.errorOccured,
+          payload: {
+            message: 'Failed to load the stories',
+          },
+        })
+      }
+    } else {
+      dispatch({
+        type: actionTypes.showMoreLoadedExperiences,
+      })
     }
   }
 
@@ -137,8 +198,6 @@ export const useExperiences = () => {
       return savedExperience
     } catch (error) {
       errorOccured('The story could not be saved')
-      console.log('error add exp', error)
-      throw Error(error)
     }
   }
 
@@ -168,8 +227,6 @@ export const useExperiences = () => {
     }
   }
 
-  // TODO:! Save new and edited stories to state correct so we dont need to fetch new data to se updates
-
   const deleteExperience = async docId => {
     fetchStart('Deleting your story')
 
@@ -187,13 +244,16 @@ export const useExperiences = () => {
 
   return {
     experiences: state.experiences,
+    shownExperiences: state.shownExperiences,
     status: state.status,
     statusMessage: state.statusMessage,
     statusNames,
     isLoading: state.status === statusNames.fetching,
+    firstLoadCompleted: state.firstLoadCompleted,
     actions: {
       addExperience,
       getExperience,
+      getExperiences,
       updateExperience,
       deleteExperience,
     },
@@ -221,9 +281,6 @@ const experiencesReducer = (
       }
     }
 
-    /*
-    Maybe have error in separate obj
-    */
     case actionTypes.errorOccured: {
       return {
         ...state,
@@ -233,53 +290,77 @@ const experiencesReducer = (
     }
 
     case actionTypes.getExperiences: {
+      let shownInState = [...state.shownExperiences]
+      let loadedInState = [...state.loadedExperiences]
+
+      const newLoaded = [...payload.loadedExperiences] || []
+      const experiencesToShow = [...payload.shownExperiences] || []
+
+      const shownExperiences = shownInState.concat(experiencesToShow)
+      const loadedExperiences = loadedInState.concat(newLoaded)
+
       return {
         ...state,
-        experiences: payload.experiences || [],
+        loadedExperiences: loadedExperiences,
+        shownExperiences: shownExperiences,
+        nextQuery: payload.nextQuery || null,
+        isOutOfQueries: payload.isOutOfQueries,
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,
+        firstLoadCompleted: true,
+      }
+    }
+
+    case actionTypes.showMoreLoadedExperiences: {
+      const loaded = [...state.loadedExperiences]
+      let shown = [...state.shownExperiences]
+
+      shown = shown.concat(loaded.splice(0, SHOW_CHUNK_SIZE))
+
+      return {
+        ...state,
+        shownExperiences: shown,
+        loadedExperiences: loaded,
+        status: statusNames.updateExperienceSuccess,
+        statusMessage: 'Your story has been updated',
       }
     }
 
     case actionTypes.addExperience: {
-      let experiences = [...state.experiences]
+      let shownExperiences = [...state.shownExperiences]
 
-      console.log('exp before', experiences)
-
-      experiences.unshift({
+      shownExperiences.unshift({
         ...payload,
       })
-
-      console.log('exp after', experiences)
 
       return {
         ...state,
         status: statusNames.addExperienceSuccess,
         statusMessage: 'Your story has been saved',
-        experiences,
+        shownExperiences,
       }
     }
 
     case actionTypes.updateExperience: {
-      let experiences = [...state.experiences]
+      let shownExperiences = [...state.shownExperiences]
 
-      const foundIndex = experiences.findIndex(x => x.docId === payload.docId)
-      experiences[foundIndex] = { ...payload }
+      const foundIndex = shownExperiences.findIndex(
+        x => x.docId === payload.docId
+      )
+      shownExperiences[foundIndex] = { ...payload }
 
       return {
         ...state,
         status: statusNames.updateExperienceSuccess,
         statusMessage: 'Your story has been updated',
-        experiences,
+        shownExperiences,
       }
     }
 
     case actionTypes.deleteExperience: {
-      let experiences = [...state.experiences]
+      let shownExperiences = [...state.shownExperiences]
 
-      console.log('Delete Exp Payload', payload)
-
-      const updatedExperiences = experiences.filter(
+      const updatedExperiences = shownExperiences.filter(
         exp => exp.docId !== payload.docId
       )
 
@@ -287,7 +368,7 @@ const experiencesReducer = (
         ...state,
         status: statusNames.deleteExperienceSuccess,
         statusMessage: 'Your story has been deleted',
-        experiences: updatedExperiences,
+        shownExperiences: updatedExperiences,
       }
     }
 
@@ -296,3 +377,9 @@ const experiencesReducer = (
     }
   }
 }
+
+/*
+
+
+
+*/

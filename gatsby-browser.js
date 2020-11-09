@@ -5,6 +5,7 @@ import { ExperiencesProvider } from './src/hooks/useExperiences'
 import { ThemeProvider } from 'emotion-theming'
 import { AuthProvider } from './src/Firebase/Auth/Auth'
 import { themes } from './src/Styles'
+import 'intersection-observer'
 
 import {
   ThemeProvider as MuiThemeProvider,
@@ -20,10 +21,8 @@ const muiTheme = createMuiTheme({
   },
 })
 
-console.log({ theme, muiTheme })
 export const wrapPageElement = ({ element, props: { location } }) => {
   return (
-    // <Auth pathname={location.pathname}>
     <AuthProvider>
       <ThemeProvider theme={theme}>
         <MuiThemeProvider theme={muiTheme}>
