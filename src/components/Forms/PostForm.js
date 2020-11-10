@@ -19,14 +19,15 @@ import FeedbackFlash from '../FeedbackFlash/FeedbackFlash'
 import ClearIcon from '@material-ui/icons/Clear'
 import getPostFormStyles from './getPostFormStyles'
 
+import Chip from "../Chip/Chip"
 const PostForm = ({ docId }) => {
   const {
-    allDatoCmsCategory: { categories },
+    allDatoCmsCategory: { categoriesCms },
   } = useStaticQuery(
     graphql`
       query {
         allDatoCmsCategory {
-          categories: nodes {
+          categoriesCms: nodes {
             name: categoryName
             short: categoryShort
           }
@@ -39,12 +40,12 @@ const PostForm = ({ docId }) => {
   const {
     Label,
     FormGroup,
-    CheckBoxWrapper,
-    CheckField,
+    ChipWrapper,
     CategoriesContainer,
     ImagesContainer,
     HasDraftInfo,
     DeleteExperienceSection,
+    EditCategoriesContainer
   } = getPostFormStyles(theme)
 
   const { uid: userId } = useSession()
@@ -54,20 +55,24 @@ const PostForm = ({ docId }) => {
   const { actions, isLoading } = useExperiences()
   const [showFeedback, setShowFeedback] = useState(false)
 
+
   /*
    * Form states and handlers
    */
 
   const [initialFormValues, setInitalFormValues] = useState({
     title: '',
-    date: new Date(),
-    categories: [],
+    date: new Date()
   })
 
+  const [categories, setCategories] = useState([])
   const [images, setImages] = useState([])
   const [countInputs, setCountInputs] = useState(-20)
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
+
+useEffect(() => {
+}, [categories]);
 
   const onEditorStateChange = editorState => {
     saveDraftToLocalStorage()
@@ -88,13 +93,12 @@ const PostForm = ({ docId }) => {
       try {
         const exp = await actions.getExperience(docId)
 
-        // TODO: Save the reuslt to state
-
         setInitalFormValues({
           title: exp.title,
           date: new Date(exp.date),
-          categories: exp.categories,
         })
+
+        setCategories(exp.categories)
 
         if (exp.images) {
           setImages(exp.images)
@@ -137,6 +141,7 @@ const PostForm = ({ docId }) => {
   const resetForm = () => {
     setEditorState(EditorState.createEmpty())
     setImages([])
+    setCategories([])
   }
 
   const closeFeedback = delay => {
@@ -147,7 +152,7 @@ const PostForm = ({ docId }) => {
 
   const onSubmit = async formInputs => {
     setShowFeedback(true)
-    const { title, categories } = formInputs
+    const { title } = formInputs
     const date = formInputs.date
       ? new Date(formInputs.date).toISOString()
       : new Date().toISOString()
@@ -166,7 +171,7 @@ const PostForm = ({ docId }) => {
         markdown: JSON.stringify(storyMarkdown),
       },
       images: images,
-      categories: categories || [],
+      categories: categories,
       isPublic: false,
     }
 
@@ -215,6 +220,7 @@ const PostForm = ({ docId }) => {
           </Button>
         </HasDraftInfo>
       )}
+
       <Form
         initialValues={initialFormValues}
         onSubmit={onSubmit}
@@ -288,32 +294,23 @@ const PostForm = ({ docId }) => {
             </FormGroup>
 
             <FormGroup className="category">
-              <Label as="span">Category</Label>
+              <Label as="span">Categories</Label>
               <CategoriesContainer>
-                {Array.isArray(categories) &&
-                  categories.length > 0 &&
-                  categories.map(({ short, name }) => (
-                    <CheckBoxWrapper key={name}>
-                      <Field
-                        type="checkbox"
-                        name="categories"
-                        value={short}
-                        initialValue={initialFormValues.categories.includes(
-                          short
-                        )}
-                        render={({ input }) => (
-                          <CheckBoxWrapper>
-                            <span>{name}</span>
-                            <CheckField>
-                              {input.checked && <CheckIcon />}
-                              <input {...input} />
-                            </CheckField>
-                          </CheckBoxWrapper>
-                        )}
-                      />
-                    </CheckBoxWrapper>
+                {Array.isArray(categoriesCms) &&
+                  categoriesCms.length > 0 &&
+                  categoriesCms.map(({ name, short }) => (
+                    <ChipWrapper key={name}>
+                      <Chip setState={setCategories} name={name} isActive={categories.includes(
+                        name)}/>
+                        </ChipWrapper>
                   ))}
               </CategoriesContainer>
+              <EditCategoriesContainer>
+                <div className="divider" />
+                <p>Edit Categories</p>
+              </EditCategoriesContainer>
+
+      
             </FormGroup>
 
             <FormGroup className="img">
@@ -323,24 +320,6 @@ const PostForm = ({ docId }) => {
                 <ImagePreview images={images} />
               </ImagesContainer>
             </FormGroup>
-            {/* <FormGroup className="public">
-            <Label htmlFor="is-public">Private / public</Label>
-            <span>Do you want to share your experience?</span>
-
-            <Field
-              type="checkbox"
-              name="isPublic"
-              value={true}
-              render={({ input }) => (
-                <CheckBoxWrapper className="" as="div">
-                  <CheckField>
-                    {input.checked && <CheckIcon />}
-                    <input id="is-public" {...input} />
-                  </CheckField>
-                </CheckBoxWrapper>
-              )}
-            />
-          </FormGroup> */}
 
             <Button disabled={submitting || isLoading}>
               {docId ? 'update' : 'save'}

@@ -55,53 +55,10 @@ const getPostFormStyles = theme => {
     }
   `
 
-  const CheckBoxWrapper = styled.label`
-    margin: 5px 10px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    position: relative;
-
-    span {
-      width: max-content;
-      margin-right: 10px;
-    }
-
-    input {
-      height: 1.5rem;
-      width: 1.5rem;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      -o-appearance: none;
-      appearance: none;
-      border: 1px solid ${theme.text};
-      border-radius: ${styles.radius.s};
-      outline: none;
-      transition-duration: 0.3s;
-      cursor: pointer;
-    }
-
-    input:checked {
-      border: 1px solid ${theme.primary};
-      background-color: #34495e;
-    }
+  const ChipWrapper = styled.div`
+        margin: 5px;
   `
 
-  const CheckField = styled.div`
-    display: grid;
-    grid: 1rem / 1rem;
-    place-items: center;
-    svg,
-    input {
-      grid-column: 1;
-      grid-row: 1;
-    }
-    svg {
-      order: 3;
-      max-width: 70%;
-      max-height: 70%;
-    }
-  `
   const CategoriesContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
@@ -110,6 +67,20 @@ const getPostFormStyles = theme => {
     padding: ${styles.space.s};
   `
 
+  const EditCategoriesContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    background: ${theme.fieldBackground};
+    padding: ${styles.space.s};
+    .divider {
+      width: 70%;
+      height: 2px;
+      background: ${theme.primary};
+      margin: 0 auto;
+    }
+  `
   const ImagesContainer = styled.div`
     display: grid;
     grid-template-columns: 1fr;
@@ -142,12 +113,12 @@ const getPostFormStyles = theme => {
   return {
     Label,
     FormGroup,
-    CheckBoxWrapper,
-    CheckField,
     CategoriesContainer,
     ImagesContainer,
     HasDraftInfo,
     DeleteExperienceSection,
+    ChipWrapper,
+    EditCategoriesContainer
   }
 }
 
