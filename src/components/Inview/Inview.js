@@ -4,7 +4,7 @@ import { useInView } from 'react-intersection-observer'
 import styled from '@emotion/styled'
 
 const Inview = ({ triggerFunction }) => {
-  const { ref, inView, entry } = useInView({
+  const { ref, inView } = useInView({
     threshold: 0,
   })
 
@@ -14,7 +14,7 @@ const Inview = ({ triggerFunction }) => {
 
   useEffect(() => {
     inView && triggerFunction()
-  }, [inView])
+  }, [inView, triggerFunction])
 
   return <StyledInview ref={ref}></StyledInview>
 }

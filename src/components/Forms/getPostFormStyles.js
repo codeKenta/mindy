@@ -56,7 +56,7 @@ const getPostFormStyles = theme => {
   `
 
   const ChipWrapper = styled.div`
-        margin: 5px;
+    margin: 5px;
   `
 
   const CategoriesContainer = styled.div`
@@ -65,21 +65,6 @@ const getPostFormStyles = theme => {
     justify-content: center;
     background: ${theme.fieldBackground};
     padding: ${styles.space.s};
-  `
-
-  const EditCategoriesContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    background: ${theme.fieldBackground};
-    padding: ${styles.space.s};
-    .divider {
-      width: 70%;
-      height: 2px;
-      background: ${theme.primary};
-      margin: 0 auto;
-    }
   `
   const ImagesContainer = styled.div`
     display: grid;
@@ -118,7 +103,6 @@ const getPostFormStyles = theme => {
     HasDraftInfo,
     DeleteExperienceSection,
     ChipWrapper,
-    EditCategoriesContainer
   }
 }
 

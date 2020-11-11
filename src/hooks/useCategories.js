@@ -1,6 +1,5 @@
 import React, { useContext, useReducer } from 'react'
 import { useSession } from '../Firebase/Auth/Auth'
-import useStorage from '../Firebase/storage'
 
 import db from '../Firebase/db'
 
@@ -26,7 +25,7 @@ const statusNames = {
 
 export const CategoriesProvider = ({ children }) => {
   const [state, dispatch] = useReducer(categoriesReducer, {
-    categories: [],
+    availableCategories: [],
     status: null,
     statusMessage: null,
   })
@@ -46,7 +45,7 @@ export const CategoriesProvider = ({ children }) => {
         dispatch({
           type: actionTypes.getCategories,
           payload: {
-            categories: categories,
+            availableCategories: categories,
           },
         })
       } catch (error) {
@@ -60,7 +59,7 @@ export const CategoriesProvider = ({ children }) => {
     }
 
     if (user) {
-      getExperiences()
+      getCategories()
     }
   }, [user])
 
@@ -125,10 +124,10 @@ export const useCategories = () => {
 
       dispatch({
         type: actionTypes.addCategory,
-        payload: { ...savedExperience },
+        payload: { ...savedCategory },
       })
 
-      return savedExperience
+      return savedCategory
     } catch (error) {
       errorOccured('The category could not be saved')
     }
@@ -168,8 +167,7 @@ export const useCategories = () => {
   }
 
   return {
-    categories: state.categories,
-    shownExperiences: state.shownExperiences,
+    availableCategories: state.availableCategories,
     status: state.status,
     statusMessage: state.statusMessage,
     statusNames,
@@ -184,7 +182,7 @@ export const useCategories = () => {
   }
 }
 
-const categoryReducer = (
+const categoriesReducer = (
   state,
   { type, status, statusMessage = '', payload }
 ) => {
@@ -216,17 +214,17 @@ const categoryReducer = (
     case actionTypes.getCategories: {
       return {
         ...state,
-        categories: [...payload.categories],
+        availableCategories: payload.categories,
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,
       }
     }
 
     case actionTypes.addCategory: {
-      let categories = [...state.categories]
+      let categories = [...state.availableCategories]
 
       // TODO: "CHECK THIS PAYLOAD"
-      stateCategories.push({
+      categories.push({
         ...payload,
       })
 
@@ -234,12 +232,12 @@ const categoryReducer = (
         ...state,
         status: statusNames.addCategorySuccess,
         statusMessage: 'Your category has been saved',
-        categories,
+        availableCategories: categories,
       }
     }
 
     case actionTypes.updateCategory: {
-      let categories = [...state.categories]
+      let categories = [...state.availableCategories]
 
       const foundIndex = categories.findIndex(x => x.docId === payload.docId)
       categories[foundIndex] = { ...payload }
@@ -248,7 +246,7 @@ const categoryReducer = (
         ...state,
         status: statusNames.updateCategorySuccess,
         statusMessage: 'Your category has been updated',
-        shownExperiences,
+        availableCategories: categories,
       }
     }
 
@@ -263,7 +261,7 @@ const categoryReducer = (
         ...state,
         status: statusNames.deleteExperienceSuccess,
         statusMessage: 'Your category has been deleted',
-        categories: updatedCategories,
+        availableCategories: updatedCategories,
       }
     }
 

@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import GlobalStyles from './src/components/Global/GlobalStyles'
 import { ExperiencesProvider } from './src/hooks/useExperiences'
+import { CategoriesProvider } from './src/hooks/useCategories'
 import { ThemeProvider } from 'emotion-theming'
 import { AuthProvider } from './src/Firebase/Auth/Auth'
 import { themes } from './src/Styles'
@@ -27,7 +28,9 @@ export const wrapPageElement = ({ element, props: { location } }) => {
       <ThemeProvider theme={theme}>
         <MuiThemeProvider theme={muiTheme}>
           <GlobalStyles />
-          <ExperiencesProvider>{element}</ExperiencesProvider>
+          <CategoriesProvider>
+            <ExperiencesProvider>{element}</ExperiencesProvider>
+          </CategoriesProvider>
         </MuiThemeProvider>
       </ThemeProvider>
     </AuthProvider>

@@ -377,9 +377,3 @@ const experiencesReducer = (
     }
   }
 }
-
-/*
-
-
-
-*/

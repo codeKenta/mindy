@@ -5,7 +5,7 @@ import { useTheme } from 'emotion-theming'
 import { useSession } from '../../Firebase/Auth/Auth'
 import { useExperiences } from '../../hooks/useExperiences'
 import Button from '../Elements/Button'
-import CheckIcon from '../Icons/check'
+import EditCategories from './EditCategories/EditCategories'
 import DateInput from './DateInput/DateInput'
 import { Editor } from 'react-draft-wysiwyg'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
@@ -19,7 +19,7 @@ import FeedbackFlash from '../FeedbackFlash/FeedbackFlash'
 import ClearIcon from '@material-ui/icons/Clear'
 import getPostFormStyles from './getPostFormStyles'
 
-import Chip from "../Chip/Chip"
+import Chip from '../Chip/Chip'
 const PostForm = ({ docId }) => {
   const {
     allDatoCmsCategory: { categoriesCms },
@@ -45,7 +45,6 @@ const PostForm = ({ docId }) => {
     ImagesContainer,
     HasDraftInfo,
     DeleteExperienceSection,
-    EditCategoriesContainer
   } = getPostFormStyles(theme)
 
   const { uid: userId } = useSession()
@@ -55,14 +54,13 @@ const PostForm = ({ docId }) => {
   const { actions, isLoading } = useExperiences()
   const [showFeedback, setShowFeedback] = useState(false)
 
-
   /*
    * Form states and handlers
    */
 
   const [initialFormValues, setInitalFormValues] = useState({
     title: '',
-    date: new Date()
+    date: new Date(),
   })
 
   const [categories, setCategories] = useState([])
@@ -70,9 +68,6 @@ const PostForm = ({ docId }) => {
   const [countInputs, setCountInputs] = useState(-20)
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
-
-useEffect(() => {
-}, [categories]);
 
   const onEditorStateChange = editorState => {
     saveDraftToLocalStorage()
@@ -300,17 +295,15 @@ useEffect(() => {
                   categoriesCms.length > 0 &&
                   categoriesCms.map(({ name, short }) => (
                     <ChipWrapper key={name}>
-                      <Chip setState={setCategories} name={name} isActive={categories.includes(
-                        name)}/>
-                        </ChipWrapper>
+                      <Chip
+                        setState={setCategories}
+                        name={name}
+                        isActive={categories.includes(name)}
+                      />
+                    </ChipWrapper>
                   ))}
               </CategoriesContainer>
-              <EditCategoriesContainer>
-                <div className="divider" />
-                <p>Edit Categories</p>
-              </EditCategoriesContainer>
-
-      
+              <EditCategories />
             </FormGroup>
 
             <FormGroup className="img">
