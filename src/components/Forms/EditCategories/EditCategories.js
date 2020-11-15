@@ -1,12 +1,12 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styled from '@emotion/styled'
-import styles from '../../../Styles'
+import styles from '@styles'
 import { useTheme } from 'emotion-theming'
 import EditIcon from '@components/Icons/edit'
 import CrossIcon from '@components/Icons/cross'
-
-import PropTypes from 'prop-types'
+import EditCategoryItem from './EditCategoryItem'
 import { useCategories } from '@hooks/useCategories'
+import { IconWrapper } from './getEditCategoriesStyles'
 
 const EditCategories = () => {
   const theme = useTheme()
@@ -35,6 +35,8 @@ const EditCategories = () => {
       display: flex;
       justify-content: center;
       align-items: center;
+      padding-top: ${styles.space.m};
+      padding-bottom: ${styles.space.s};
       h4 {
         margin-right: 10px;
       }
@@ -70,70 +72,30 @@ const EditCategories = () => {
             className={`icon-wrapper ${showEdit ? 'close' : 'open'}`}
             onClick={toggleEdit}
           >
-            {showEdit ? <CrossIcon /> : <EditIcon />}
-          </div>
-          <div>
-            <div>
-              Dream Big{' '}
-              <div>
+            {showEdit ? (
+              <IconWrapper color={theme.error}>
+                <CrossIcon />
+              </IconWrapper>
+            ) : (
+              <IconWrapper color={theme.success}>
                 <EditIcon />
-              </div>
-            </div>
+              </IconWrapper>
+            )}
           </div>
         </div>
       </EditCategoriesContainer>
-      <EditList>
-        {mockCategories.length !== 0 &&
-          mockCategories.map(({ name, id }) => (
-            <EditCategoryItem key={id} id={id} categoryName={name} />
-          ))}
-        <EditCategoryItem />
-      </EditList>
+
+      {showEdit ? (
+        <EditList>
+          {mockCategories.length !== 0 &&
+            mockCategories.map(({ id, name }) => (
+              <EditCategoryItem key={id} id={id} categoryName={name} />
+            ))}
+          <EditCategoryItem />
+        </EditList>
+      ) : null}
     </>
   )
 }
 
 export default EditCategories
-
-const EditCategoryItem = ({ categoryName = '', id }) => {
-  const theme = useTheme()
-
-  const textInputRef = useRef()
-
-  function handleSubmit(e) {
-    e.preventDefault()
-    console.log(textInputRef.current.value)
-  }
-
-  const StyledItem = styled.li`
-    display: flex;
-    justify-content: space-between;
-    padding: ${styles.space.m};
-    background: #101e40;
-
-    input {
-      display: block;
-      background: transparent;
-      color: white;
-      border: none;
-      font-weight: bold;
-    }
-  `
-  const placeHolder = categoryName ? '' : 'Add category'
-
-  return (
-    <StyledItem>
-      <input
-        ref={textInputRef}
-        defaultValue={categoryName}
-        placeholder={placeHolder}
-        type="text"
-      />
-
-      <div>
-        <button onClick={handleSubmit}>save</button>
-        <button onClick={handleSubmit}>delete</button>
-      </div>
-    </StyledItem>
-  )
-}
