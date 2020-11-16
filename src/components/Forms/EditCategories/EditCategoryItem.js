@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import ActionButtons from './ActionButtons'
 
 import styled from '@emotion/styled'
-import styles from '@styles'
+import styles from '@styles/'
 
 const Item = styled.li`
   display: flex;

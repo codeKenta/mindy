@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { useTheme } from 'emotion-theming'
 import styled from '@emotion/styled'
-import styles from '@styles'
+import styles from '@styles/'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faImage } from '@fortawesome/free-solid-svg-icons'
 
