@@ -2,14 +2,14 @@ import React from 'react'
 import MuiChip from '@material-ui/core/Chip'
 import PropTypes from 'prop-types'
 
-const Chip = ({ isActive, name, setState }) => {
+const Chip = ({ isActive, id, name, setState }) => {
   const handleClick = () => {
     setState(prevState => {
-      if (prevState.includes(name)) {
-        return prevState.filter(category => category !== name)
+      if (prevState.includes(id)) {
+        return prevState.filter(category => category !== id)
       } else {
         let state = [...prevState]
-        state.push(name)
+        state.push(id)
         return state
       }
     })
@@ -31,6 +31,7 @@ const Chip = ({ isActive, name, setState }) => {
 Chip.propTypes = {
   isActive: PropTypes.bool.isRequired,
   name: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
   setState: PropTypes.func.isRequired,
 }
 

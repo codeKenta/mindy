@@ -124,7 +124,7 @@ export const themes = {
     secondary: '#1D2843',
     complement: '#354A68',
     disabled: '#414142',
-    success: '#14D069',
+    success: '#46FFFF',
     error: '#DC1289',
   },
   light: {

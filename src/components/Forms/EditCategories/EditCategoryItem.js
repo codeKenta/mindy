@@ -1,13 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import ActionButtons from './ActionButtons'
 
 import styled from '@emotion/styled'
 import styles from '@styles'
-import { useTheme } from 'emotion-theming'
-import CrossIcon from '@components/Icons/cross'
-import CheckIcon from '@components/Icons/check2'
-import TrashIcon from '@components/Icons/trash'
-import { ActionButtonsWrapper, IconWrapper } from './getEditCategoriesStyles'
 
 const Item = styled.li`
   display: flex;
@@ -31,7 +27,6 @@ const EditCategoryItem = ({ categoryName, id }) => {
   }
 
   function undoChanges() {
-    console.log('HELLO UNDO ')
     setInputValue(categoryName)
   }
 
@@ -66,64 +61,4 @@ EditCategoryItem.propTypes = {
   id: PropTypes.string,
 }
 
-const ActionButtons = ({
-  newCategoryName,
-  currentCategoryName,
-  categoryId,
-  undoChanges,
-}) => {
-  const theme = useTheme()
-
-  function save(e) {
-    e.preventDefault()
-    console.log('SAVE', currentCategoryName)
-  }
-
-  function remove(e) {
-    e.preventDefault()
-    console.log('REMOVE', currentCategoryName)
-  }
-
-  const HAS_CHANGED =
-    Boolean(newCategoryName) && newCategoryName !== currentCategoryName
-
-  const SHOW_REMOVE =
-    Boolean(currentCategoryName) &&
-    Boolean(newCategoryName) &&
-    newCategoryName === currentCategoryName
-
-  return (
-    <ActionButtonsWrapper>
-      {HAS_CHANGED && (
-        <>
-          <IconWrapper color={theme.success} onClick={save}>
-            <CheckIcon />
-          </IconWrapper>
-          <IconWrapper color={theme.error} onClick={undoChanges}>
-            <CrossIcon />
-          </IconWrapper>
-        </>
-      )}
-      {SHOW_REMOVE && (
-        <IconWrapper color={theme.error} onClick={remove}>
-          <TrashIcon />
-        </IconWrapper>
-      )}
-    </ActionButtonsWrapper>
-  )
-}
-
 export default EditCategoryItem
-
-ActionButtons.defaultProps = {
-  id: '',
-  currentCategoryName: '',
-  newCategoryName: '',
-}
-
-ActionButtons.propTypes = {
-  newCategoryName: PropTypes.string,
-  currentCategoryName: PropTypes.string,
-  id: PropTypes.string,
-  undoChanges: PropTypes.func.isRequired,
-}

@@ -33,7 +33,6 @@ export const CategoriesProvider = ({ children }) => {
   const user = useSession()
 
   React.useEffect(() => {
-    // TODO: Move actions out of scope so it can be reused
     const getCategories = async () => {
       dispatch({
         type: actionTypes.fetchStart,
@@ -49,6 +48,7 @@ export const CategoriesProvider = ({ children }) => {
           },
         })
       } catch (error) {
+        console.error('getCategories', error)
         dispatch({
           type: actionTypes.errorOccured,
           payload: {
@@ -117,7 +117,8 @@ export const useCategories = () => {
 
   const addCategory = async category => {
     fetchStart('Saving your category')
-    let categoryData = { ...category, uid: user.uid }
+
+    let categoryData = { value: category, uid: user.uid, isActive: true }
 
     try {
       const savedCategory = await db.addCategory(categoryData)
@@ -136,18 +137,21 @@ export const useCategories = () => {
   const updateCategory = async (docId, category) => {
     fetchStart('Saving your story')
 
-    let categoryData = { ...category }
+    let categoryData = { docId, value: category, uid: user.id }
+
+    console.error('UPDATE CATEGORY', categoryData)
 
     try {
-      const updatedCategory = await db.updateCategory(docId, categoryData)
+      const updatedCategory = await db.updateCategory(docId, category)
 
       dispatch({
         type: actionTypes.updateCategory,
-        payload: { ...categoryData, docId },
+        payload: { ...categoryData },
       })
       return updatedCategory
     } catch (error) {
       errorOccured('The category could not be updated')
+      console.error('update error', error)
     }
   }
 
@@ -214,7 +218,7 @@ const categoriesReducer = (
     case actionTypes.getCategories: {
       return {
         ...state,
-        availableCategories: payload.categories,
+        availableCategories: payload.availableCategories,
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,
       }
@@ -223,7 +227,6 @@ const categoriesReducer = (
     case actionTypes.addCategory: {
       let categories = [...state.availableCategories]
 
-      // TODO: "CHECK THIS PAYLOAD"
       categories.push({
         ...payload,
       })

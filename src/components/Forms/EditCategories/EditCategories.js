@@ -56,12 +56,6 @@ const EditCategories = () => {
     list-style: none;
   `
 
-  const mockCategories = [
-    { id: 'a', name: 'Dream' },
-    { id: 'b', name: 'Relaxed' },
-    { id: 'c', name: 'Meditation' },
-  ]
-
   return (
     <>
       <EditCategoriesContainer>
@@ -85,15 +79,20 @@ const EditCategories = () => {
         </div>
       </EditCategoriesContainer>
 
-      {showEdit ? (
+      {showEdit && (
         <EditList>
-          {mockCategories.length !== 0 &&
-            mockCategories.map(({ id, name }) => (
-              <EditCategoryItem key={id} id={id} categoryName={name} />
+          {Array.isArray(availableCategories) &&
+            availableCategories.length !== 0 &&
+            availableCategories.map(({ uid, value }) => (
+              <>
+                {uid && value ? (
+                  <EditCategoryItem key={uid} id={uid} categoryName={value} />
+                ) : null}
+              </>
             ))}
           <EditCategoryItem />
         </EditList>
-      ) : null}
+      )}
     </>
   )
 }

@@ -1,6 +1,16 @@
-
-import { addExperience, getExperiences, getExperience, updateExperience, deleteExperience } from "./experiences"
-import { addCategory, getCategories, updateCategory, deleteCategory } from "./categories"
+import {
+  addExperience,
+  getExperiences,
+  getExperience,
+  updateExperience,
+  deleteExperience,
+} from './experiences'
+import {
+  addCategory,
+  getCategories,
+  updateCategory,
+  deleteCategory,
+} from './categories'
 
 export default {
   addExperience,
@@ -11,5 +21,5 @@ export default {
   addCategory,
   getCategories,
   updateCategory,
-  deleteCategory
+  deleteCategory,
 }

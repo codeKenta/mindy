@@ -3,7 +3,9 @@ import { graphql, useStaticQuery, navigate } from 'gatsby'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useSession } from '../../Firebase/Auth/Auth'
-import { useExperiences } from '../../hooks/useExperiences'
+import { useExperiences } from '@hooks/useExperiences'
+import { useCategories } from '@hooks/useCategories'
+
 import Button from '../Elements/Button'
 import EditCategories from './EditCategories/EditCategories'
 import DateInput from './DateInput/DateInput'
@@ -21,21 +23,6 @@ import getPostFormStyles from './getPostFormStyles'
 
 import Chip from '../Chip/Chip'
 const PostForm = ({ docId }) => {
-  const {
-    allDatoCmsCategory: { categoriesCms },
-  } = useStaticQuery(
-    graphql`
-      query {
-        allDatoCmsCategory {
-          categoriesCms: nodes {
-            name: categoryName
-            short: categoryShort
-          }
-        }
-      }
-    `
-  )
-
   const theme = useTheme()
   const {
     Label,
@@ -52,6 +39,8 @@ const PostForm = ({ docId }) => {
   const localStorageKey = docId ? `${userId}${docId}` : userId
 
   const { actions, isLoading } = useExperiences()
+  const { availableCategories } = useCategories()
+
   const [showFeedback, setShowFeedback] = useState(false)
 
   /*
@@ -291,14 +280,15 @@ const PostForm = ({ docId }) => {
             <FormGroup className="category">
               <Label as="span">Categories</Label>
               <CategoriesContainer>
-                {Array.isArray(categoriesCms) &&
-                  categoriesCms.length > 0 &&
-                  categoriesCms.map(({ name, short }) => (
-                    <ChipWrapper key={name}>
+                {Array.isArray(availableCategories) &&
+                  availableCategories.length > 0 &&
+                  availableCategories.map(({ value, docId }) => (
+                    <ChipWrapper key={docId}>
                       <Chip
                         setState={setCategories}
-                        name={name}
-                        isActive={categories.includes(name)}
+                        name={value}
+                        id={docId}
+                        isActive={categories.includes(docId)}
                       />
                     </ChipWrapper>
                   ))}

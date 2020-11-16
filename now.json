@@ -8,6 +8,8 @@
     "env": {
       "GATSBY_DB_NAME": "@mindy-db-name",
       "GATSBY_EXPERIENCE_COLLECTION_NAME": "@mindy-experience-collection-name",
+      "GATSBY_CATEGORIES_COLLECTION_NAME": "@mindy-categories-collection-name",
+
       "GATSBY_APP_ID": "@mindy-app-id",
       "DATO_CMS_TOKEN": "@mindy-dato-cms-token"
     }
