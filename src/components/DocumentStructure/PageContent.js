@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from '@emotion/styled'
 
-import styles, { helpers } from '@styles'
+import styles, { helpers } from '@styling'
 
 const StyledPageContent = styled.div`
   width: 100%;

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import styles from '@styles/'
+import styles from '@styling'
 
 const getPostFormStyles = theme => {
   const Label = styled.label`

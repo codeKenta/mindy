@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'gatsby'
 import styled from '@emotion/styled'
-import styles, { helpers } from '@styles'
+import styles, { helpers } from '@styling'
 import { useTheme } from 'emotion-theming'
 
 const { space, contentMaxWidth } = styles

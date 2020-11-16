@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSession, useAuth } from '../../Firebase/Auth/Auth'
 import styled from '@emotion/styled'
-import styles, { helpers } from '@styles'
+import styles, { helpers } from '@styling'
 
 const StyledFooter = styled.footer`
   background: darkslateblue;

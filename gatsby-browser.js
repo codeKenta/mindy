@@ -5,7 +5,7 @@ import { ExperiencesProvider } from './src/hooks/useExperiences'
 import { CategoriesProvider } from './src/hooks/useCategories'
 import { ThemeProvider } from 'emotion-theming'
 import { AuthProvider } from './src/Firebase/Auth/Auth'
-import { themes } from '@styles'
+import { themes } from '@styling'
 import 'intersection-observer'
 
 import {

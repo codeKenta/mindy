@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useTheme } from 'emotion-theming'
 
 import styled from '@emotion/styled'
-import styles from '@styles/'
+import styles from '@styling'
 
 import { useExperiences } from '../../hooks/useExperiences'
 import CircleCheckLoader from '../Loaders/CircleCheckLoader'
