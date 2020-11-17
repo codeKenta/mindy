@@ -1,7 +1,9 @@
 import React from 'react'
 import Moment from 'react-moment'
-import { graphql, useStaticQuery, Link } from 'gatsby'
-import { useExperiences } from '../../hooks/useExperiences'
+import { Link } from 'gatsby'
+import { useExperiences } from '@hooks/useExperiences'
+import { useCategories } from '@hooks/useCategories'
+
 import Heading from '../Elements/Heading'
 import PlaceholderFeed from '../PlaceholderFeed/PlaceholderFeed'
 
@@ -27,24 +29,13 @@ const ExperiencesPage = () => {
     Story,
   } = experiencePageStyles
 
-  const { allDatoCmsCategory } = useStaticQuery(
-    graphql`
-      query {
-        allDatoCmsCategory {
-          categories: nodes {
-            short: categoryShort
-            name: categoryName
-          }
-        }
-      }
-    `
-  )
+  const { availableCategories } = useCategories()
 
   const buildCategoriesSwitch = () => {
     let obj = {}
 
-    allDatoCmsCategory.categories.forEach(({ short, name }) => {
-      obj[short] = name
+    availableCategories.forEach(({ docId, value }) => {
+      obj[docId] = value
     })
     return obj
   }
@@ -54,10 +45,9 @@ const ExperiencesPage = () => {
   const buildCategoriesString = categories => {
     let categoryNames = []
 
-    categories.forEach(category => {
-      categoryNames.push(cagegoriesSwitch[category])
+    categories.forEach(id => {
+      if (cagegoriesSwitch[id]) categoryNames.push(cagegoriesSwitch[id])
     })
-
     return categoryNames.join(', ')
   }
 

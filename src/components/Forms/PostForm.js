@@ -3,13 +3,15 @@ import { graphql, useStaticQuery, navigate } from 'gatsby'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useSession } from '../../Firebase/Auth/Auth'
-import { useExperiences } from '../../hooks/useExperiences'
+import { useExperiences } from '@hooks/useExperiences'
+import { useCategories } from '@hooks/useCategories'
+
 import Button from '../Elements/Button'
-import CheckIcon from '../Icons/check'
+import EditCategories from './EditCategories/EditCategories'
 import DateInput from './DateInput/DateInput'
 import { Editor } from 'react-draft-wysiwyg'
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
-import '../../Styles/react-draft-wysiwyg.css'
+import './react-draft-wysiwyg.css'
 import draftToHtml from 'draftjs-to-html'
 import draftToMarkdown from 'draftjs-to-markdown'
 import DropZone from './DropZone/DropZone'
@@ -19,28 +21,13 @@ import FeedbackFlash from '../FeedbackFlash/FeedbackFlash'
 import ClearIcon from '@material-ui/icons/Clear'
 import getPostFormStyles from './getPostFormStyles'
 
+import Chip from '../Chip/Chip'
 const PostForm = ({ docId }) => {
-  const {
-    allDatoCmsCategory: { categories },
-  } = useStaticQuery(
-    graphql`
-      query {
-        allDatoCmsCategory {
-          categories: nodes {
-            name: categoryName
-            short: categoryShort
-          }
-        }
-      }
-    `
-  )
-
   const theme = useTheme()
   const {
     Label,
     FormGroup,
-    CheckBoxWrapper,
-    CheckField,
+    ChipWrapper,
     CategoriesContainer,
     ImagesContainer,
     HasDraftInfo,
@@ -52,6 +39,8 @@ const PostForm = ({ docId }) => {
   const localStorageKey = docId ? `${userId}${docId}` : userId
 
   const { actions, isLoading } = useExperiences()
+  const { availableCategories } = useCategories()
+
   const [showFeedback, setShowFeedback] = useState(false)
 
   /*
@@ -61,9 +50,9 @@ const PostForm = ({ docId }) => {
   const [initialFormValues, setInitalFormValues] = useState({
     title: '',
     date: new Date(),
-    categories: [],
   })
 
+  const [categories, setCategories] = useState([])
   const [images, setImages] = useState([])
   const [countInputs, setCountInputs] = useState(-20)
 
@@ -88,13 +77,14 @@ const PostForm = ({ docId }) => {
       try {
         const exp = await actions.getExperience(docId)
 
-        // TODO: Save the reuslt to state
-
         setInitalFormValues({
           title: exp.title,
           date: new Date(exp.date),
-          categories: exp.categories,
         })
+
+        setCategories(exp.categories)
+
+        console.log('Categories', exp.categories)
 
         if (exp.images) {
           setImages(exp.images)
@@ -137,6 +127,7 @@ const PostForm = ({ docId }) => {
   const resetForm = () => {
     setEditorState(EditorState.createEmpty())
     setImages([])
+    setCategories([])
   }
 
   const closeFeedback = delay => {
@@ -147,7 +138,7 @@ const PostForm = ({ docId }) => {
 
   const onSubmit = async formInputs => {
     setShowFeedback(true)
-    const { title, categories } = formInputs
+    const { title } = formInputs
     const date = formInputs.date
       ? new Date(formInputs.date).toISOString()
       : new Date().toISOString()
@@ -166,7 +157,7 @@ const PostForm = ({ docId }) => {
         markdown: JSON.stringify(storyMarkdown),
       },
       images: images,
-      categories: categories || [],
+      categories: categories,
       isPublic: false,
     }
 
@@ -215,6 +206,7 @@ const PostForm = ({ docId }) => {
           </Button>
         </HasDraftInfo>
       )}
+
       <Form
         initialValues={initialFormValues}
         onSubmit={onSubmit}
@@ -288,32 +280,22 @@ const PostForm = ({ docId }) => {
             </FormGroup>
 
             <FormGroup className="category">
-              <Label as="span">Category</Label>
+              <Label as="span">Categories</Label>
               <CategoriesContainer>
-                {Array.isArray(categories) &&
-                  categories.length > 0 &&
-                  categories.map(({ short, name }) => (
-                    <CheckBoxWrapper key={name}>
-                      <Field
-                        type="checkbox"
-                        name="categories"
-                        value={short}
-                        initialValue={initialFormValues.categories.includes(
-                          short
-                        )}
-                        render={({ input }) => (
-                          <CheckBoxWrapper>
-                            <span>{name}</span>
-                            <CheckField>
-                              {input.checked && <CheckIcon />}
-                              <input {...input} />
-                            </CheckField>
-                          </CheckBoxWrapper>
-                        )}
+                {Array.isArray(availableCategories) &&
+                  availableCategories.length > 0 &&
+                  availableCategories.map(({ value, docId }) => (
+                    <ChipWrapper key={docId}>
+                      <Chip
+                        setState={setCategories}
+                        name={value}
+                        id={docId}
+                        isActive={categories.includes(docId)}
                       />
-                    </CheckBoxWrapper>
+                    </ChipWrapper>
                   ))}
               </CategoriesContainer>
+              <EditCategories />
             </FormGroup>
 
             <FormGroup className="img">
@@ -323,24 +305,6 @@ const PostForm = ({ docId }) => {
                 <ImagePreview images={images} />
               </ImagesContainer>
             </FormGroup>
-            {/* <FormGroup className="public">
-            <Label htmlFor="is-public">Private / public</Label>
-            <span>Do you want to share your experience?</span>
-
-            <Field
-              type="checkbox"
-              name="isPublic"
-              value={true}
-              render={({ input }) => (
-                <CheckBoxWrapper className="" as="div">
-                  <CheckField>
-                    {input.checked && <CheckIcon />}
-                    <input id="is-public" {...input} />
-                  </CheckField>
-                </CheckBoxWrapper>
-              )}
-            />
-          </FormGroup> */}
 
             <Button disabled={submitting || isLoading}>
               {docId ? 'update' : 'save'}

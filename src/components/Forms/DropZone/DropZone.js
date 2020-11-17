@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useTheme } from 'emotion-theming'
 import styled from '@emotion/styled'
-import styles from '../../../Styles'
+import styles from '@styling'
 import { useDropzone } from 'react-dropzone'
 
 const Text = styled.p`

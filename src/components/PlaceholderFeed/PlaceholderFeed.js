@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from '@emotion/styled'
-import styles from '../../Styles'
+import styles from '@styling'
 import ContentLoader from 'react-content-loader'
 
 const StyledItem = styled.div`

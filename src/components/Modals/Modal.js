@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { useTheme } from 'emotion-theming'
 
 import styled from '@emotion/styled'
-import styles from '../../Styles'
+import styles from '@styling'
 
 import { useExperiences } from '../../hooks/useExperiences'
 import { css } from '@emotion/core'

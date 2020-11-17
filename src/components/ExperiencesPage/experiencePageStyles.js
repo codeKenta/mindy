@@ -1,4 +1,4 @@
-import styles from '../../Styles'
+import styles from '@styling'
 import styled from '@emotion/styled'
 const Section = styled.section``
 const Experience = styled.article`

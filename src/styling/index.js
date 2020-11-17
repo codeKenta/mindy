@@ -124,8 +124,8 @@ export const themes = {
     secondary: '#1D2843',
     complement: '#354A68',
     disabled: '#414142',
-    success: '#00A56F',
-    error: '#EF176E',
+    success: '#46FFFF',
+    error: '#DC1289',
   },
   light: {
     text: '#9EABC2',
