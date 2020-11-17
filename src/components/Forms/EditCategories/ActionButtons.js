@@ -28,11 +28,17 @@ const ActionButtons = ({
     Boolean(newCategoryName) &&
     newCategoryName === currentCategoryName
 
-  async function save(e) {
+  async function edit(e) {
     e.preventDefault()
-    if (newCategoryName && typeof newCategoryName === 'string') {
-      if (HAS_CHANGED) await updateCategory(categoryId, newCategoryName)
-      else await addCategory(newCategoryName)
+    if (newCategoryName && typeof newCategoryName === 'string' && HAS_CHANGED) {
+      await updateCategory(categoryId, newCategoryName)
+    }
+  }
+
+  async function add(e) {
+    e.preventDefault()
+    if (newCategoryName) {
+      await addCategory(newCategoryName)
     }
   }
 
@@ -44,7 +50,7 @@ const ActionButtons = ({
     <ActionButtonsWrapper>
       {HAS_CHANGED && (
         <>
-          <IconWrapper color={theme.success} onClick={save}>
+          <IconWrapper color={theme.success} onClick={categoryId ? edit : add}>
             <CheckIcon />
           </IconWrapper>
           <IconWrapper color={theme.error} onClick={undoChanges}>
