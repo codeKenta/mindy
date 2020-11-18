@@ -8,7 +8,7 @@ const IndexPage = () => {
   const theme = useTheme()
 
   return (
-    <Layout background={theme.sectionBackground}>
+    <Layout>
       <AuthRequired>
         <ExperiencesPage />
       </AuthRequired>
