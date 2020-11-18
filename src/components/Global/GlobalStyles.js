@@ -15,7 +15,7 @@ const GlobalStyles = () => {
           margin: 0;
           font-size: ${styles.font.fontSize.s};
           font-family: ${styles.font.fontFamily.body};
-          background: ${theme.background};
+          background: ${theme.sectionBackground};
           color: ${theme.text};
           line-height: ${styles.font.lineHeights.body};
           letter-spacing: 0.1rem;

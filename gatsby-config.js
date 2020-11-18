@@ -6,7 +6,7 @@ const path = require('path')
 module.exports = {
   siteMetadata: {
     title: `Mindy`,
-    description: `Mind your minds business`,
+    description: `Your personal journaling tool`,
     author: `Kenneth Österholm`,
   },
   plugins: [
@@ -61,6 +61,7 @@ module.exports = {
       options: {
         fonts: [
           `Nunito\:300,300i,400,400i,700,700i`, // you can also specify font weights and styles
+          `Kufam`,
         ],
         // fonts: [
 

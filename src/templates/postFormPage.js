@@ -5,10 +5,8 @@ import StoryFormPage from '../components/StoryFormPage/StoryFormPage'
 import { useTheme } from 'emotion-theming'
 
 const IndexPage = ({ docId }) => {
-  const theme = useTheme()
-
   return (
-    <Layout background={theme.sectionBackground}>
+    <Layout>
       <AuthRequired>
         <StoryFormPage docId={docId || null} />
       </AuthRequired>
