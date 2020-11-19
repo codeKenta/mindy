@@ -11,7 +11,10 @@ const AuthRequired = ({ children }) => {
 
   if (user) {
     return <>{children}</>
-  } else return <Landing />
+  } else {
+    navigate('/')
+    return <Landing />
+  }
 }
 
 AuthRequired.propTypes = {

@@ -8,9 +8,10 @@ import fawkes from '@components/Icons/Anonymous/guy-fawkes-mask.svg'
 import LoginButton from '@components/LoginButton/LoginButton'
 
 const LoginSection = styled.div`
-  top: 20vh;
-  position: fixed;
-  width: 100%;
+  margin-top: 100px;
+  @media (min-width: 500px) {
+    margin-top: 25vh;
+  }
 `
 
 const InnerWrapper = styled.div`
