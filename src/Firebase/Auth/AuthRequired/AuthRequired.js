@@ -12,7 +12,7 @@ const AuthRequired = ({ children }) => {
   if (user) {
     return <>{children}</>
   } else {
-    navigate('/')
+    if (typeof window !== 'undefined') navigate('/')
     return <Landing />
   }
 }
