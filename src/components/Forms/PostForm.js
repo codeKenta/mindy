@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { graphql, useStaticQuery, navigate } from 'gatsby'
+import { navigate } from 'gatsby'
 import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useSession } from '../../Firebase/Auth/Auth'
@@ -20,8 +20,8 @@ import { stripHtml } from '../../helpers'
 import FeedbackFlash from '../FeedbackFlash/FeedbackFlash'
 import ClearIcon from '@material-ui/icons/Clear'
 import getPostFormStyles from './getPostFormStyles'
+import Categories from '@components/Categories/Categories'
 
-import Chip from '../Chip/Chip'
 const PostForm = ({ docId }) => {
   const theme = useTheme()
   const {
@@ -281,20 +281,12 @@ const PostForm = ({ docId }) => {
 
             <FormGroup className="category">
               <Label as="span">Categories</Label>
-              <CategoriesContainer>
-                {Array.isArray(availableCategories) &&
-                  availableCategories.length > 0 &&
-                  availableCategories.map(({ value, docId }) => (
-                    <ChipWrapper key={docId}>
-                      <Chip
-                        setState={setCategories}
-                        name={value}
-                        id={docId}
-                        isActive={categories.includes(docId)}
-                      />
-                    </ChipWrapper>
-                  ))}
-              </CategoriesContainer>
+
+              <Categories
+                activeCategories={categories}
+                setActiveCategories={setCategories}
+              />
+
               <EditCategories />
             </FormGroup>
 

@@ -3,13 +3,12 @@ import Moment from 'react-moment'
 import { Link } from 'gatsby'
 import { useExperiences } from '@hooks/useExperiences'
 import { useCategories } from '@hooks/useCategories'
-
-import Heading from '../Elements/Heading'
-import PlaceholderFeed from '../PlaceholderFeed/PlaceholderFeed'
-
-import ReactMarkdown from 'react-markdown'
 import EditIcon from '@material-ui/icons/Edit'
-import Inview from '../Inview/Inview'
+import Heading from '@components/Elements/Heading'
+import PlaceholderFeed from '@components/PlaceholderFeed/PlaceholderFeed'
+import FilterPosts from '@components/FilterPosts/FilterPosts'
+import ReactMarkdown from 'react-markdown'
+import Inview from '@components/Inview/Inview'
 import experiencePageStyles from './experiencePageStyles'
 
 const ExperiencesPage = () => {
@@ -79,6 +78,7 @@ const ExperiencesPage = () => {
   return (
     <Section>
       <Heading level={1}>Your experiences</Heading>
+      <FilterPosts />
       {renderExperiences}
       {isLoading && <PlaceholderFeed />}
       {firstLoadCompleted && <Inview triggerFunction={getExperiences} />}

@@ -55,17 +55,6 @@ const getPostFormStyles = theme => {
     }
   `
 
-  const ChipWrapper = styled.div`
-    margin: 5px;
-  `
-
-  const CategoriesContainer = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    background: ${theme.fieldBackground};
-    padding: ${styles.space.s};
-  `
   const ImagesContainer = styled.div`
     display: grid;
     grid-template-columns: 1fr;
@@ -98,11 +87,9 @@ const getPostFormStyles = theme => {
   return {
     Label,
     FormGroup,
-    CategoriesContainer,
     ImagesContainer,
     HasDraftInfo,
     DeleteExperienceSection,
-    ChipWrapper,
   }
 }
 
