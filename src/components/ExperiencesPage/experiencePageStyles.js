@@ -30,4 +30,18 @@ const TopGroup = styled.div`
 
 const Story = styled.p``
 
-export default { Section, Experience, DateText, Categories, TopGroup, Story }
+const NoStories = styled.p`
+  text-align: center;
+  font-size: 18px;
+  margin-top: 40px;
+`
+
+export default {
+  Section,
+  Experience,
+  DateText,
+  Categories,
+  TopGroup,
+  Story,
+  NoStories,
+}

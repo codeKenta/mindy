@@ -1,36 +1,45 @@
-import React, { useState } from 'react'
-// import styled from '@emotion/styled'
-// import styles from '@styling'
-// import { useTheme } from 'emotion-theming'
+import React, { useEffect, useState } from 'react'
+import throttle from 'lodash.throttle'
+import styled from '@emotion/styled'
+
+import { useExperiences } from '@hooks/useExperiences'
 
 import Categories from '@components/Categories/Categories'
 
-// const getStyles = theme => {
-//   const CategoriesContainer = styled.div`
-//     display: flex;
-//     flex-wrap: wrap;
-//     justify-content: center;
-//     background: ${theme.fieldBackground};
-//     padding: ${styles.space.s};
-//   `
-//   const ChipWrapper = styled.div`
-//     margin: 5px;
-//   `
-//   return { CategoriesContainer, ChipWrapper }
-// }
-
+const Wrapper = styled.div`
+  margin-bottom: 20px;
+`
 const FilterPosts = () => {
   //   const theme = useTheme()
+
   const [categories, setCategories] = useState([])
 
+  const {
+    firstLoadCompleted,
+    actions: { getExperiences },
+  } = useExperiences()
+
+  useEffect(() => {
+    if (firstLoadCompleted) {
+      function handleGetExperiences() {
+        getExperiences(categories, null, null, true)
+      }
+
+      const throttledGetExperiences = throttle(handleGetExperiences, 100000, {
+        trailing: false,
+      })
+      throttledGetExperiences()
+    }
+  }, [categories])
+
   return (
-    <div>
+    <Wrapper>
       <Categories
         useToFilter={true}
         activeCategories={categories}
         setActiveCategories={setCategories}
       />
-    </div>
+    </Wrapper>
   )
 }
 

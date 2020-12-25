@@ -31,30 +31,33 @@ const Categories = ({ activeCategories, setActiveCategories, useToFilter }) => {
   }
 
   return (
-    <CategoriesContainer>
-      {useToFilter && Array.isArray(availableCategories) && (
-        <ChipWrapper>
-          <MuiChip
-            variant={activeCategories.length === 0 ? 'default' : 'outlined'}
-            size="medium"
-            label={'All'}
-            onClick={clearCategories}
-            color="primary"
-          />
-        </ChipWrapper>
-      )}
-      {Array.isArray(availableCategories) &&
-        availableCategories.map(({ value, docId }) => (
-          <ChipWrapper key={docId}>
-            <Chip
-              setState={setActiveCategories}
-              name={value}
-              id={docId}
-              isActive={activeCategories.includes(docId)}
-            />
-          </ChipWrapper>
-        ))}
-    </CategoriesContainer>
+    <>
+      {Array.isArray(availableCategories) && availableCategories.length > 0 ? (
+        <CategoriesContainer>
+          {useToFilter && Array.isArray(availableCategories) && (
+            <ChipWrapper>
+              <MuiChip
+                variant={activeCategories.length === 0 ? 'default' : 'outlined'}
+                size="medium"
+                label={'All'}
+                onClick={clearCategories}
+                color="primary"
+              />
+            </ChipWrapper>
+          )}
+          {availableCategories.map(({ value, docId }) => (
+            <ChipWrapper key={docId}>
+              <Chip
+                setState={setActiveCategories}
+                name={value}
+                id={docId}
+                isActive={activeCategories.includes(docId)}
+              />
+            </ChipWrapper>
+          ))}
+        </CategoriesContainer>
+      ) : null}
+    </>
   )
 }
 
