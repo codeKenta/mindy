@@ -27,6 +27,11 @@ const getExperiencesQuery = (
     query = query.where('categories', 'array-contains-any', categories)
   }
 
+  query = query
+    .orderBy('date', 'desc')
+    // .startAfter(lastVisible)
+    .limit(LIMIT)
+
   return query.get().then(async function(documentSnapshots) {
     const lastVisible =
       documentSnapshots.docs[documentSnapshots.docs.length - 1]

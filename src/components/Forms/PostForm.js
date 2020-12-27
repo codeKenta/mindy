@@ -4,7 +4,6 @@ import { Form, Field } from 'react-final-form'
 import { useTheme } from 'emotion-theming'
 import { useSession } from '../../Firebase/Auth/Auth'
 import { useExperiences } from '@hooks/useExperiences'
-import { useCategories } from '@hooks/useCategories'
 
 import Button from '../Elements/Button'
 import EditCategories from './EditCategories/EditCategories'
@@ -27,8 +26,6 @@ const PostForm = ({ docId }) => {
   const {
     Label,
     FormGroup,
-    ChipWrapper,
-    CategoriesContainer,
     ImagesContainer,
     HasDraftInfo,
     DeleteExperienceSection,
@@ -39,7 +36,6 @@ const PostForm = ({ docId }) => {
   const localStorageKey = docId ? `${userId}${docId}` : userId
 
   const { actions, isLoading } = useExperiences()
-  const { availableCategories } = useCategories()
 
   const [showFeedback, setShowFeedback] = useState(false)
 

@@ -163,8 +163,6 @@ export const useExperiences = () => {
         toDate: clearBefore ? toDate : state.filter.fromDate,
       }
 
-      console.log('getExperiences ACTION, state before', state)
-
       try {
         const {
           experiences,
@@ -177,12 +175,6 @@ export const useExperiences = () => {
           filter.fromDate,
           clearBefore ? null : state.nextQuery
         )
-
-        console.log('getExperiences ACTION, result after', {
-          experiences,
-          nextQuery,
-          isOutOfQueries,
-        })
 
         let loadedExperiences = [...experiences]
         let shownExperiences = loadedExperiences.splice(0, SHOW_CHUNK_SIZE)
