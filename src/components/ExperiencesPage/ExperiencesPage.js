@@ -1,15 +1,15 @@
 import React from 'react'
 import Moment from 'react-moment'
 import { Link } from 'gatsby'
+
 import { useExperiences } from '@hooks/useExperiences'
 import { useCategories } from '@hooks/useCategories'
-
-import Heading from '../Elements/Heading'
-import PlaceholderFeed from '../PlaceholderFeed/PlaceholderFeed'
-
-import ReactMarkdown from 'react-markdown'
 import EditIcon from '@material-ui/icons/Edit'
-import Inview from '../Inview/Inview'
+import Heading from '@components/Elements/Heading'
+import PlaceholderFeed from '@components/PlaceholderFeed/PlaceholderFeed'
+import FilterPosts from '@components/FilterPosts/FilterPosts'
+import ReactMarkdown from 'react-markdown'
+import Inview from '@components/Inview/Inview'
 import experiencePageStyles from './experiencePageStyles'
 
 const ExperiencesPage = () => {
@@ -27,6 +27,7 @@ const ExperiencesPage = () => {
     Categories,
     TopGroup,
     Story,
+    NoStories,
   } = experiencePageStyles
 
   const { availableCategories } = useCategories()
@@ -45,22 +46,21 @@ const ExperiencesPage = () => {
   const buildCategoriesString = categories => {
     let categoryNames = []
 
-    categories.forEach(id => {
-      if (cagegoriesSwitch[id]) categoryNames.push(cagegoriesSwitch[id])
-    })
+    if (categories) {
+      categories.forEach(id => {
+        if (cagegoriesSwitch[id]) categoryNames.push(cagegoriesSwitch[id])
+      })
+    }
+
     return categoryNames.join(', ')
   }
 
   const renderExperiences = shownExperiences.map(exp => {
-    const storyPureText = typeof exp.story === 'string' ? exp.story : null
-
     const storyTextAsMarkdown =
-      !storyPureText && exp.story && exp.story.markdown
-        ? JSON.parse(exp.story.markdown)
-        : null
+      exp.story && exp.story.markdown ? JSON.parse(exp.story.markdown) : null
 
     return (
-      <Experience key={exp.title + exp.date.toString()}>
+      <Experience key={exp.docId}>
         <TopGroup>
           <Heading level={2}>{exp.title}</Heading>
           <Link to={`/edit-story/${exp.docId}`}>
@@ -71,15 +71,21 @@ const ExperiencesPage = () => {
           <Moment format="dddd, MMMM Do YYYY">{exp.date}</Moment>
         </DateText>
         <Categories>{buildCategoriesString(exp.categories)}</Categories>
-        <Story>{storyPureText}</Story>
-        {!storyPureText && <ReactMarkdown source={storyTextAsMarkdown} />}
+        <ReactMarkdown source={storyTextAsMarkdown} />
       </Experience>
     )
   })
+
   return (
     <Section>
       <Heading level={1}>Your experiences</Heading>
+      <FilterPosts />
       {renderExperiences}
+      {!isLoading && renderExperiences.length === 0 && (
+        <NoStories>
+          No stories found. Add a new story or try a different filter.
+        </NoStories>
+      )}
       {isLoading && <PlaceholderFeed />}
       {firstLoadCompleted && <Inview triggerFunction={getExperiences} />}
     </Section>

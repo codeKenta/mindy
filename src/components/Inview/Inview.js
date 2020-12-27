@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useInView } from 'react-intersection-observer'
+import throttle from 'lodash.throttle'
+
 import styled from '@emotion/styled'
 
 const Inview = ({ triggerFunction }) => {
@@ -13,7 +15,15 @@ const Inview = ({ triggerFunction }) => {
   `
 
   useEffect(() => {
-    inView && triggerFunction()
+    if (inView) {
+      const throttledGetExperiences = throttle(triggerFunction, 200000, {
+        trailing: false,
+      })
+
+      throttledGetExperiences()
+
+      // inView && triggerFunction()
+    }
   }, [inView, triggerFunction])
 
   return <StyledInview ref={ref}></StyledInview>

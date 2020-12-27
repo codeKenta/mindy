@@ -16,16 +16,24 @@ const actionTypes = {
   getExperience: 'GET_EXPERIENCE',
   deleteExperience: 'DELETE_EXPERIENCE',
   showMoreLoadedExperiences: 'SHOW_MORE_LOADED_EXPERIENCES',
+  clearExpereinces: 'CLEAR_EXPERIENCES',
 }
 
 const statusNames = {
   error: 'error',
   fetching: 'fetching',
   getExperiencesSuccess: 'load-experiences-success',
+  clearedExperiences: 'cleared-experiences',
   addExperienceSuccess: 'add-experiences-success',
   getExperienceSuccess: 'get-experience-success',
   updateExperienceSuccess: 'update-experience-success',
   deleteExperienceSuccess: 'delete-exprience-success',
+}
+
+const noneFilter = {
+  categories: [],
+  fromDate: null,
+  toDate: null,
 }
 
 export const ExperiencesProvider = ({ children }) => {
@@ -37,6 +45,9 @@ export const ExperiencesProvider = ({ children }) => {
     isOutOfQueries: false,
     status: null,
     statusMessage: null,
+    filter: {
+      ...noneFilter,
+    },
   })
 
   const user = useSession()
@@ -128,25 +139,50 @@ export const useExperiences = () => {
       return experience
     } catch (error) {
       errorOccured('The experience could not be fetched')
-      // navigate('/')
     }
   }
 
-  const getExperiences = async () => {
-    if (state.loadedExperiences.length === 0) {
-      if (state.isOutOfQueries) {
+  const getExperiences = async (
+    categories = [],
+    fromDate = null,
+    toDate = null,
+    clearBefore = false
+  ) => {
+    if (clearBefore || state.loadedExperiences.length === 0) {
+      if (!clearBefore && state.isOutOfQueries) {
         return
       }
       dispatch({
         type: actionTypes.fetchStart,
         statusMessage: 'Loading stories',
       })
+
+      const filter = {
+        categories: clearBefore ? categories : state.filter.categories,
+        fromDate: clearBefore ? fromDate : state.filter.fromDate,
+        toDate: clearBefore ? toDate : state.filter.fromDate,
+      }
+
+      console.log('getExperiences ACTION, state before', state)
+
       try {
         const {
           experiences,
           nextQuery,
           isOutOfQueries,
-        } = await db.getExperiences(user.uid, state.nextQuery)
+        } = await db.getExperiences(
+          user.uid,
+          filter.categories,
+          filter.fromDate,
+          filter.fromDate,
+          clearBefore ? null : state.nextQuery
+        )
+
+        console.log('getExperiences ACTION, result after', {
+          experiences,
+          nextQuery,
+          isOutOfQueries,
+        })
 
         let loadedExperiences = [...experiences]
         let shownExperiences = loadedExperiences.splice(0, SHOW_CHUNK_SIZE)
@@ -158,6 +194,8 @@ export const useExperiences = () => {
             shownExperiences,
             nextQuery,
             isOutOfQueries,
+            clearBefore,
+            filter,
           },
         })
       } catch (error) {
@@ -289,25 +327,63 @@ const experiencesReducer = (
       }
     }
 
+    case actionTypes.clearExpereinces: {
+      return {
+        ...state,
+        loadedExperiences: [],
+        shownExperiences: [],
+        nextQuery: null,
+        isOutOfQueries: true,
+        status: statusNames.clearedExperiences,
+        statusMessage: null,
+        firstLoadCompleted: false,
+      }
+    }
+
     case actionTypes.getExperiences: {
+      const {
+        clearBefore,
+        loadedExperiences,
+        shownExperiences,
+        isOutOfQueries,
+        nextQuery,
+        filter,
+      } = payload
+
+      if (clearBefore) {
+        return {
+          ...state,
+          loadedExperiences: loadedExperiences,
+          shownExperiences: shownExperiences,
+          nextQuery: nextQuery || null,
+          isOutOfQueries: isOutOfQueries,
+          status: statusNames.getExperiencesSuccess,
+          statusMessage: null,
+          firstLoadCompleted: true,
+          filter: {
+            ...filter,
+          },
+        }
+      }
+
       let shownInState = [...state.shownExperiences]
       let loadedInState = [...state.loadedExperiences]
 
-      const newLoaded = [...payload.loadedExperiences] || []
-      const experiencesToShow = [...payload.shownExperiences] || []
-
-      const shownExperiences = shownInState.concat(experiencesToShow)
-      const loadedExperiences = loadedInState.concat(newLoaded)
+      const newLoaded = [...loadedExperiences] || []
+      const experiencesToShow = [...shownExperiences] || []
 
       return {
         ...state,
-        loadedExperiences: loadedExperiences,
-        shownExperiences: shownExperiences,
-        nextQuery: payload.nextQuery || null,
-        isOutOfQueries: payload.isOutOfQueries,
+        loadedExperiences: loadedInState.concat(newLoaded),
+        shownExperiences: shownInState.concat(experiencesToShow),
+        nextQuery: nextQuery || null,
+        isOutOfQueries: isOutOfQueries,
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,
         firstLoadCompleted: true,
+        filter: {
+          ...filter,
+        },
       }
     }
 
