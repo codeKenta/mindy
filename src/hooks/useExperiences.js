@@ -163,8 +163,6 @@ export const useExperiences = () => {
         toDate: clearBefore ? toDate : state.filter.fromDate,
       }
 
-      console.log('getExperiences ACTION, state before', state)
-
       try {
         const {
           experiences,
@@ -177,12 +175,6 @@ export const useExperiences = () => {
           filter.fromDate,
           clearBefore ? null : state.nextQuery
         )
-
-        console.log('getExperiences ACTION, result after', {
-          experiences,
-          nextQuery,
-          isOutOfQueries,
-        })
 
         let loadedExperiences = [...experiences]
         let shownExperiences = loadedExperiences.splice(0, SHOW_CHUNK_SIZE)
@@ -207,6 +199,14 @@ export const useExperiences = () => {
         })
       }
     } else {
+      dispatch({
+        type: actionTypes.showMoreLoadedExperiences,
+      })
+    }
+  }
+
+  const showMoreLoadedExperiences = () => {
+    if (state.loadedExperiences.length !== 0) {
       dispatch({
         type: actionTypes.showMoreLoadedExperiences,
       })
@@ -294,6 +294,7 @@ export const useExperiences = () => {
       getExperiences,
       updateExperience,
       deleteExperience,
+      showMoreLoadedExperiences,
     },
   }
 }
@@ -341,6 +342,7 @@ const experiencesReducer = (
     }
 
     case actionTypes.getExperiences: {
+      console.log('REDUCER- getExperiences')
       const {
         clearBefore,
         loadedExperiences,
@@ -355,7 +357,7 @@ const experiencesReducer = (
           ...state,
           loadedExperiences: loadedExperiences,
           shownExperiences: shownExperiences,
-          nextQuery: nextQuery || null,
+          nextQuery: nextQuery,
           isOutOfQueries: isOutOfQueries,
           status: statusNames.getExperiencesSuccess,
           statusMessage: null,
@@ -376,7 +378,7 @@ const experiencesReducer = (
         ...state,
         loadedExperiences: loadedInState.concat(newLoaded),
         shownExperiences: shownInState.concat(experiencesToShow),
-        nextQuery: nextQuery || null,
+        nextQuery: nextQuery,
         isOutOfQueries: isOutOfQueries,
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,

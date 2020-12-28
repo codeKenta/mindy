@@ -16,13 +16,15 @@ const Inview = ({ triggerFunction }) => {
 
   useEffect(() => {
     if (inView) {
-      const throttledGetExperiences = throttle(triggerFunction, 200000, {
+      console.log('INVIEW EFFECT is in view')
+
+      const throttledGetExperiences = throttle(triggerFunction, 500000, {
         trailing: false,
       })
 
       throttledGetExperiences()
 
-      // inView && triggerFunction()
+      inView && triggerFunction()
     }
   }, [inView, triggerFunction])
 
