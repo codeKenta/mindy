@@ -14,40 +14,32 @@ export const addExperience = async payload => {
   }
 }
 
+const LIMIT = 20
+
 const getExperiencesQuery = (
   uid,
   query,
   categories = [],
   fromDate = null,
-  toDate = null
+  toDate = null,
+  isNext
 ) => {
-  const LIMIT = 20
-
-  if (categories.length > 0) {
-    query = query.where('categories', 'array-contains-any', categories)
-  }
-
-  query = query
-    .orderBy('date', 'desc')
-    // .startAfter(lastVisible)
-    .limit(LIMIT)
-
   return query.get().then(async function(documentSnapshots) {
     const lastVisible =
       documentSnapshots.docs[documentSnapshots.docs.length - 1]
 
-    let data = []
+    const data = documentSnapshots.docs.map(doc => {
+      return {
+        ...doc.data(),
+        docId: doc.id,
+      }
+    })
+
+    let isOutOfQueries = data.length === 0
+
     let nextQuery = null
-    let isOutOfQueries = documentSnapshots.docs.length === 0
 
-    if (documentSnapshots.docs.length > 0) {
-      data = documentSnapshots.docs.map(doc => {
-        return {
-          ...doc.data(),
-          docId: doc.id,
-        }
-      })
-
+    if (documentSnapshots.docs.length === LIMIT) {
       nextQuery = db
         .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
         .where('uid', '==', uid)
@@ -59,7 +51,6 @@ const getExperiencesQuery = (
           categories
         )
       }
-
       nextQuery = nextQuery
         .orderBy('date', 'desc')
         .startAfter(lastVisible)
@@ -72,8 +63,8 @@ const getExperiencesQuery = (
 
     return {
       experiences: data,
-      nextQuery: nextQuery,
-      isOutOfQueries: isOutOfQueries,
+      nextQuery,
+      isOutOfQueries,
     }
   })
 }
@@ -87,15 +78,31 @@ export const getExperiences = async (
 ) => {
   let query
 
+  let isNextQuery = false
   if (nextQuery) {
+    isNextQuery = true
+
     query = nextQuery
   } else {
     query = db
       .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
       .where('uid', '==', uid)
+
+    if (categories.length > 0) {
+      query = query.where('categories', 'array-contains-any', categories)
+    }
+
+    query = query.orderBy('date', 'desc').limit(LIMIT)
   }
 
-  return getExperiencesQuery(uid, query, categories, fromDate, toDate)
+  return getExperiencesQuery(
+    uid,
+    query,
+    categories,
+    fromDate,
+    toDate,
+    isNextQuery
+  )
 }
 
 export const getExperience = async docId => {

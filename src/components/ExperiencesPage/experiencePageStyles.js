@@ -28,7 +28,11 @@ const TopGroup = styled.div`
   justify-content: space-between;
 `
 
-const Story = styled.p``
+const Center = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`
 
 const NoStories = styled.p`
   text-align: center;
@@ -42,6 +46,6 @@ export default {
   DateText,
   Categories,
   TopGroup,
-  Story,
+  Center,
   NoStories,
 }

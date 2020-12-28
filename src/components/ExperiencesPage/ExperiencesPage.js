@@ -10,12 +10,14 @@ import PlaceholderFeed from '@components/PlaceholderFeed/PlaceholderFeed'
 import FilterPosts from '@components/FilterPosts/FilterPosts'
 import ReactMarkdown from 'react-markdown'
 import Inview from '@components/Inview/Inview'
+import Button from '@components/Elements/Button'
 import experiencePageStyles from './experiencePageStyles'
 
 const ExperiencesPage = () => {
   const {
+    isOutOfQueries,
     shownExperiences,
-    firstLoadCompleted,
+    // firstLoadCompleted,
     isLoading,
     actions: { getExperiences },
   } = useExperiences()
@@ -26,7 +28,7 @@ const ExperiencesPage = () => {
     DateText,
     Categories,
     TopGroup,
-    Story,
+    Center,
     NoStories,
   } = experiencePageStyles
 
@@ -87,7 +89,16 @@ const ExperiencesPage = () => {
         </NoStories>
       )}
       {isLoading && <PlaceholderFeed />}
-      {firstLoadCompleted && <Inview triggerFunction={getExperiences} />}
+
+      {!isOutOfQueries && (
+        <Center>
+          <Button disabled={isLoading} clickHandler={getExperiences}>
+            Load more
+          </Button>
+        </Center>
+      )}
+
+      {/* {firstLoadCompleted && <Inview triggerFunction={getExperiences} />} */}
     </Section>
   )
 }

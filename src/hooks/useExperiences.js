@@ -205,6 +205,14 @@ export const useExperiences = () => {
     }
   }
 
+  const showMoreLoadedExperiences = () => {
+    if (state.loadedExperiences.length !== 0) {
+      dispatch({
+        type: actionTypes.showMoreLoadedExperiences,
+      })
+    }
+  }
+
   const addExperience = async experience => {
     fetchStart('Saving your story')
     let experienceData = { ...experience, uid: user.uid }
@@ -286,6 +294,7 @@ export const useExperiences = () => {
       getExperiences,
       updateExperience,
       deleteExperience,
+      showMoreLoadedExperiences,
     },
   }
 }
@@ -333,6 +342,7 @@ const experiencesReducer = (
     }
 
     case actionTypes.getExperiences: {
+      console.log('REDUCER- getExperiences')
       const {
         clearBefore,
         loadedExperiences,
@@ -347,7 +357,7 @@ const experiencesReducer = (
           ...state,
           loadedExperiences: loadedExperiences,
           shownExperiences: shownExperiences,
-          nextQuery: nextQuery || null,
+          nextQuery: nextQuery,
           isOutOfQueries: isOutOfQueries,
           status: statusNames.getExperiencesSuccess,
           statusMessage: null,
@@ -368,7 +378,7 @@ const experiencesReducer = (
         ...state,
         loadedExperiences: loadedInState.concat(newLoaded),
         shownExperiences: shownInState.concat(experiencesToShow),
-        nextQuery: nextQuery || null,
+        nextQuery: nextQuery,
         isOutOfQueries: isOutOfQueries,
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,
