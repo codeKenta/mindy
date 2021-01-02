@@ -44,13 +44,8 @@ const getExperiencesQuery = (
         .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
         .where('uid', '==', uid)
 
-      if (categories.length > 0) {
-        nextQuery = nextQuery.where(
-          'categories',
-          'array-contains-any',
-          categories
-        )
-      }
+      nextQuery = filterQuery(nextQuery, categories, fromDate, toDate)
+
       nextQuery = nextQuery
         .orderBy('date', 'desc')
         .startAfter(lastVisible)
@@ -69,6 +64,22 @@ const getExperiencesQuery = (
   })
 }
 
+const filterQuery = (query, categories, fromDate, toDate) => {
+  if (fromDate) {
+    query = query.where('date', '>=', fromDate)
+  }
+
+  if (toDate) {
+    query = query.where('date', '<=', toDate)
+  }
+
+  if (categories.length > 0) {
+    query = query.where('categories', 'array-contains-any', categories)
+  }
+
+  return query
+}
+
 export const getExperiences = async (
   uid,
   categories = [],
@@ -76,6 +87,8 @@ export const getExperiences = async (
   toDate = null,
   nextQuery = null
 ) => {
+  console.log('EXP DB', { fromDate, toDate })
+
   let query
 
   let isNextQuery = false
@@ -88,9 +101,19 @@ export const getExperiences = async (
       .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
       .where('uid', '==', uid)
 
-    if (categories.length > 0) {
-      query = query.where('categories', 'array-contains-any', categories)
-    }
+    query = filterQuery(query, categories, fromDate, toDate)
+
+    // if (fromDate) {
+    //   query = query.where('date', '>=', fromDate)
+    // }
+
+    // if (toDate) {
+    //   query = query.where('date', '<=', toDate)
+    // }
+
+    // if (categories.length > 0) {
+    //   query = query.where('categories', 'array-contains-any', categories)
+    // }
 
     query = query.orderBy('date', 'desc').limit(LIMIT)
   }

@@ -157,10 +157,14 @@ export const useExperiences = () => {
         statusMessage: 'Loading stories',
       })
 
+      const convertDate = date => {
+        return date ? new Date(date).toISOString() : null
+      }
+
       const filter = {
         categories: clearBefore ? categories : state.filter.categories,
-        fromDate: clearBefore ? fromDate : state.filter.fromDate,
-        toDate: clearBefore ? toDate : state.filter.fromDate,
+        fromDate: clearBefore ? convertDate(fromDate) : state.filter.fromDate,
+        toDate: clearBefore ? convertDate(toDate) : state.filter.fromDate,
       }
 
       try {
@@ -172,7 +176,7 @@ export const useExperiences = () => {
           user.uid,
           filter.categories,
           filter.fromDate,
-          filter.fromDate,
+          filter.toDate,
           clearBefore ? null : state.nextQuery
         )
 
