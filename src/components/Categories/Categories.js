@@ -4,7 +4,7 @@ import styled from '@emotion/styled'
 import styles from '@styling'
 import { useTheme } from 'emotion-theming'
 import { useCategories } from '@hooks/useCategories'
-import Chip from '@components/Chip/Chip'
+import CategoryChip from '@components/CategoryChip/CategoryChip'
 import MuiChip from '@material-ui/core/Chip'
 
 const getStyles = theme => {
@@ -27,7 +27,7 @@ const Categories = ({ activeCategories, setActiveCategories, useToFilter }) => {
   const { CategoriesContainer, ChipWrapper } = getStyles(theme)
 
   function clearCategories() {
-    setActiveCategories([])
+    setActiveCategories(useToFilter ? null : [])
   }
 
   return (
@@ -47,8 +47,9 @@ const Categories = ({ activeCategories, setActiveCategories, useToFilter }) => {
           )}
           {availableCategories.map(({ value, docId }) => (
             <ChipWrapper key={docId}>
-              <Chip
+              <CategoryChip
                 setState={setActiveCategories}
+                globalState={useToFilter}
                 name={value}
                 id={docId}
                 isActive={activeCategories.includes(docId)}

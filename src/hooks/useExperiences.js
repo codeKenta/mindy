@@ -17,6 +17,7 @@ const actionTypes = {
   deleteExperience: 'DELETE_EXPERIENCE',
   showMoreLoadedExperiences: 'SHOW_MORE_LOADED_EXPERIENCES',
   clearExpereinces: 'CLEAR_EXPERIENCES',
+  setCategoryFilter: 'SET_CATEGORY_FILTER',
 }
 
 const statusNames = {
@@ -30,12 +31,6 @@ const statusNames = {
   deleteExperienceSuccess: 'delete-exprience-success',
 }
 
-const noneFilter = {
-  categories: [],
-  fromDate: null,
-  toDate: null,
-}
-
 export const ExperiencesProvider = ({ children }) => {
   const [state, dispatch] = useReducer(experiencesReducer, {
     loadedExperiences: [],
@@ -46,7 +41,9 @@ export const ExperiencesProvider = ({ children }) => {
     status: null,
     statusMessage: null,
     filter: {
-      ...noneFilter,
+      categories: [],
+      startDate: null,
+      endDate: null,
     },
   })
 
@@ -129,6 +126,13 @@ export const useExperiences = () => {
     })
   }
 
+  const setCategoryFilter = categoryId => {
+    dispatch({
+      type: actionTypes.setCategoryFilter,
+      payload: { categoryId },
+    })
+  }
+
   const getExperience = async docId => {
     fetchStart()
 
@@ -142,12 +146,7 @@ export const useExperiences = () => {
     }
   }
 
-  const getExperiences = async (
-    categories = [],
-    fromDate = null,
-    toDate = null,
-    clearBefore = false
-  ) => {
+  const getExperiences = async (clearBefore = false) => {
     if (clearBefore || state.loadedExperiences.length === 0) {
       if (!clearBefore && state.isOutOfQueries) {
         return
@@ -157,15 +156,11 @@ export const useExperiences = () => {
         statusMessage: 'Loading stories',
       })
 
-      const convertDate = date => {
-        return date ? new Date(date).toISOString() : null
-      }
+      // const convertDate = date => {
+      //   return date ? new Date(date).toISOString() : null
+      // }
 
-      const filter = {
-        categories: clearBefore ? categories : state.filter.categories,
-        fromDate: clearBefore ? convertDate(fromDate) : state.filter.fromDate,
-        toDate: clearBefore ? convertDate(toDate) : state.filter.fromDate,
-      }
+      const { filter } = state
 
       try {
         const {
@@ -175,8 +170,8 @@ export const useExperiences = () => {
         } = await db.getExperiences(
           user.uid,
           filter.categories,
-          filter.fromDate,
-          filter.toDate,
+          filter.startDate,
+          filter.endDate,
           clearBefore ? null : state.nextQuery
         )
 
@@ -191,7 +186,6 @@ export const useExperiences = () => {
             nextQuery,
             isOutOfQueries,
             clearBefore,
-            filter,
           },
         })
       } catch (error) {
@@ -292,6 +286,7 @@ export const useExperiences = () => {
     statusNames,
     isLoading: state.status === statusNames.fetching,
     firstLoadCompleted: state.firstLoadCompleted,
+    filter: state.filter,
     actions: {
       addExperience,
       getExperience,
@@ -299,6 +294,7 @@ export const useExperiences = () => {
       updateExperience,
       deleteExperience,
       showMoreLoadedExperiences,
+      setCategoryFilter,
     },
   }
 }
@@ -324,6 +320,30 @@ const experiencesReducer = (
       }
     }
 
+    case actionTypes.setCategoryFilter: {
+      const { categoryId } = payload
+
+      let newCategories = []
+      let prevState = state.filter.categories
+
+      if (categoryId) {
+        if (prevState.includes(categoryId)) {
+          newCategories = prevState.filter(category => category !== categoryId)
+        } else {
+          newCategories = [...prevState]
+          newCategories.push(categoryId)
+        }
+      }
+
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          categories: newCategories,
+        },
+      }
+    }
+
     case actionTypes.errorOccured: {
       return {
         ...state,
@@ -346,14 +366,12 @@ const experiencesReducer = (
     }
 
     case actionTypes.getExperiences: {
-      console.log('REDUCER- getExperiences')
       const {
         clearBefore,
         loadedExperiences,
         shownExperiences,
         isOutOfQueries,
         nextQuery,
-        filter,
       } = payload
 
       if (clearBefore) {
@@ -366,9 +384,6 @@ const experiencesReducer = (
           status: statusNames.getExperiencesSuccess,
           statusMessage: null,
           firstLoadCompleted: true,
-          filter: {
-            ...filter,
-          },
         }
       }
 
@@ -387,9 +402,6 @@ const experiencesReducer = (
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,
         firstLoadCompleted: true,
-        filter: {
-          ...filter,
-        },
       }
     }
 
