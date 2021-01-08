@@ -16,24 +16,19 @@ const actionTypes = {
   getExperience: 'GET_EXPERIENCE',
   deleteExperience: 'DELETE_EXPERIENCE',
   showMoreLoadedExperiences: 'SHOW_MORE_LOADED_EXPERIENCES',
-  clearExpereinces: 'CLEAR_EXPERIENCES',
+  setCategoryFilter: 'SET_CATEGORY_FILTER',
+  setStartDateFilter: 'SET_START_DATE_FILTER',
+  setEndDateFilter: 'SET_END_DATE_FILTER',
 }
 
 const statusNames = {
   error: 'error',
   fetching: 'fetching',
   getExperiencesSuccess: 'load-experiences-success',
-  clearedExperiences: 'cleared-experiences',
   addExperienceSuccess: 'add-experiences-success',
   getExperienceSuccess: 'get-experience-success',
   updateExperienceSuccess: 'update-experience-success',
   deleteExperienceSuccess: 'delete-exprience-success',
-}
-
-const noneFilter = {
-  categories: [],
-  fromDate: null,
-  toDate: null,
 }
 
 export const ExperiencesProvider = ({ children }) => {
@@ -46,7 +41,9 @@ export const ExperiencesProvider = ({ children }) => {
     status: null,
     statusMessage: null,
     filter: {
-      ...noneFilter,
+      categories: [],
+      startDate: null,
+      endDate: null,
     },
   })
 
@@ -129,6 +126,27 @@ export const useExperiences = () => {
     })
   }
 
+  const setCategoryFilter = categoryId => {
+    dispatch({
+      type: actionTypes.setCategoryFilter,
+      payload: { categoryId },
+    })
+  }
+
+  const setStartDateFilter = startDate => {
+    dispatch({
+      type: actionTypes.setStartDateFilter,
+      payload: { startDate },
+    })
+  }
+
+  const setEndDateFilter = endDate => {
+    dispatch({
+      type: actionTypes.setEndDateFilter,
+      payload: { endDate },
+    })
+  }
+
   const getExperience = async docId => {
     fetchStart()
 
@@ -142,12 +160,7 @@ export const useExperiences = () => {
     }
   }
 
-  const getExperiences = async (
-    categories = [],
-    fromDate = null,
-    toDate = null,
-    clearBefore = false
-  ) => {
+  const getExperiences = async (clearBefore = false) => {
     if (clearBefore || state.loadedExperiences.length === 0) {
       if (!clearBefore && state.isOutOfQueries) {
         return
@@ -157,11 +170,7 @@ export const useExperiences = () => {
         statusMessage: 'Loading stories',
       })
 
-      const filter = {
-        categories: clearBefore ? categories : state.filter.categories,
-        fromDate: clearBefore ? fromDate : state.filter.fromDate,
-        toDate: clearBefore ? toDate : state.filter.fromDate,
-      }
+      const { filter } = state
 
       try {
         const {
@@ -171,8 +180,8 @@ export const useExperiences = () => {
         } = await db.getExperiences(
           user.uid,
           filter.categories,
-          filter.fromDate,
-          filter.fromDate,
+          filter.startDate,
+          filter.endDate,
           clearBefore ? null : state.nextQuery
         )
 
@@ -187,7 +196,6 @@ export const useExperiences = () => {
             nextQuery,
             isOutOfQueries,
             clearBefore,
-            filter,
           },
         })
       } catch (error) {
@@ -288,6 +296,7 @@ export const useExperiences = () => {
     statusNames,
     isLoading: state.status === statusNames.fetching,
     firstLoadCompleted: state.firstLoadCompleted,
+    filter: state.filter,
     actions: {
       addExperience,
       getExperience,
@@ -295,6 +304,9 @@ export const useExperiences = () => {
       updateExperience,
       deleteExperience,
       showMoreLoadedExperiences,
+      setCategoryFilter,
+      setStartDateFilter,
+      setEndDateFilter,
     },
   }
 }
@@ -320,6 +332,53 @@ const experiencesReducer = (
       }
     }
 
+    case actionTypes.setCategoryFilter: {
+      const { categoryId } = payload
+
+      let newCategories = []
+      let prevState = state.filter.categories
+
+      if (categoryId) {
+        if (prevState.includes(categoryId)) {
+          newCategories = prevState.filter(category => category !== categoryId)
+        } else {
+          newCategories = [...prevState]
+          newCategories.push(categoryId)
+        }
+      }
+
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          categories: newCategories,
+        },
+      }
+    }
+
+    case actionTypes.setStartDateFilter: {
+      const { startDate } = payload
+
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          startDate: startDate ?? null,
+        },
+      }
+    }
+
+    case actionTypes.setEndDateFilter: {
+      const { endDate } = payload
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          endDate: endDate ?? null,
+        },
+      }
+    }
+
     case actionTypes.errorOccured: {
       return {
         ...state,
@@ -328,28 +387,13 @@ const experiencesReducer = (
       }
     }
 
-    case actionTypes.clearExpereinces: {
-      return {
-        ...state,
-        loadedExperiences: [],
-        shownExperiences: [],
-        nextQuery: null,
-        isOutOfQueries: true,
-        status: statusNames.clearedExperiences,
-        statusMessage: null,
-        firstLoadCompleted: false,
-      }
-    }
-
     case actionTypes.getExperiences: {
-      console.log('REDUCER- getExperiences')
       const {
         clearBefore,
         loadedExperiences,
         shownExperiences,
         isOutOfQueries,
         nextQuery,
-        filter,
       } = payload
 
       if (clearBefore) {
@@ -362,9 +406,6 @@ const experiencesReducer = (
           status: statusNames.getExperiencesSuccess,
           statusMessage: null,
           firstLoadCompleted: true,
-          filter: {
-            ...filter,
-          },
         }
       }
 
@@ -383,9 +424,6 @@ const experiencesReducer = (
         status: statusNames.getExperiencesSuccess,
         statusMessage: null,
         firstLoadCompleted: true,
-        filter: {
-          ...filter,
-        },
       }
     }
 

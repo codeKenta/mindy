@@ -20,9 +20,8 @@ const getExperiencesQuery = (
   uid,
   query,
   categories = [],
-  fromDate = null,
-  toDate = null,
-  isNext
+  startDate = null,
+  endDate = null
 ) => {
   return query.get().then(async function(documentSnapshots) {
     const lastVisible =
@@ -44,13 +43,8 @@ const getExperiencesQuery = (
         .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
         .where('uid', '==', uid)
 
-      if (categories.length > 0) {
-        nextQuery = nextQuery.where(
-          'categories',
-          'array-contains-any',
-          categories
-        )
-      }
+      nextQuery = filterQuery(nextQuery, categories, startDate, endDate)
+
       nextQuery = nextQuery
         .orderBy('date', 'desc')
         .startAfter(lastVisible)
@@ -69,11 +63,50 @@ const getExperiencesQuery = (
   })
 }
 
+const filterQuery = (query, categories, startDate, endDate) => {
+  const convertDateToIsoString = date => {
+    return new Date(date).toISOString()
+  }
+
+  if (
+    startDate &&
+    endDate &&
+    convertDateToIsoString(startDate) === convertDateToIsoString(endDate)
+  ) {
+    query = query.where('date', '>=', convertDateToIsoString(startDate))
+
+    let newEndDate = new Date(endDate)
+    newEndDate.setDate(newEndDate.getDate() + 1)
+
+    query = query.where('date', '<=', convertDateToIsoString(newEndDate))
+  }
+
+  if (
+    startDate &&
+    convertDateToIsoString(startDate) !== convertDateToIsoString(endDate)
+  ) {
+    query = query.where('date', '>=', convertDateToIsoString(startDate))
+  }
+
+  if (
+    endDate &&
+    convertDateToIsoString(startDate) !== convertDateToIsoString(endDate)
+  ) {
+    query = query.where('date', '<=', convertDateToIsoString(endDate))
+  }
+
+  if (categories.length > 0) {
+    query = query.where('categories', 'array-contains-any', categories)
+  }
+
+  return query
+}
+
 export const getExperiences = async (
   uid,
   categories = [],
-  fromDate = null,
-  toDate = null,
+  startDate = null,
+  endDate = null,
   nextQuery = null
 ) => {
   let query
@@ -88,9 +121,7 @@ export const getExperiences = async (
       .collection(process.env.GATSBY_EXPERIENCE_COLLECTION_NAME)
       .where('uid', '==', uid)
 
-    if (categories.length > 0) {
-      query = query.where('categories', 'array-contains-any', categories)
-    }
+    query = filterQuery(query, categories, startDate, endDate)
 
     query = query.orderBy('date', 'desc').limit(LIMIT)
   }
@@ -99,8 +130,8 @@ export const getExperiences = async (
     uid,
     query,
     categories,
-    fromDate,
-    toDate,
+    startDate,
+    endDate,
     isNextQuery
   )
 }
