@@ -16,15 +16,15 @@ const actionTypes = {
   getExperience: 'GET_EXPERIENCE',
   deleteExperience: 'DELETE_EXPERIENCE',
   showMoreLoadedExperiences: 'SHOW_MORE_LOADED_EXPERIENCES',
-  clearExpereinces: 'CLEAR_EXPERIENCES',
   setCategoryFilter: 'SET_CATEGORY_FILTER',
+  setStartDateFilter: 'SET_START_DATE_FILTER',
+  setEndDateFilter: 'SET_END_DATE_FILTER',
 }
 
 const statusNames = {
   error: 'error',
   fetching: 'fetching',
   getExperiencesSuccess: 'load-experiences-success',
-  clearedExperiences: 'cleared-experiences',
   addExperienceSuccess: 'add-experiences-success',
   getExperienceSuccess: 'get-experience-success',
   updateExperienceSuccess: 'update-experience-success',
@@ -133,6 +133,20 @@ export const useExperiences = () => {
     })
   }
 
+  const setStartDateFilter = startDate => {
+    dispatch({
+      type: actionTypes.setStartDateFilter,
+      payload: { startDate },
+    })
+  }
+
+  const setEndDateFilter = endDate => {
+    dispatch({
+      type: actionTypes.setEndDateFilter,
+      payload: { endDate },
+    })
+  }
+
   const getExperience = async docId => {
     fetchStart()
 
@@ -155,10 +169,6 @@ export const useExperiences = () => {
         type: actionTypes.fetchStart,
         statusMessage: 'Loading stories',
       })
-
-      // const convertDate = date => {
-      //   return date ? new Date(date).toISOString() : null
-      // }
 
       const { filter } = state
 
@@ -295,6 +305,8 @@ export const useExperiences = () => {
       deleteExperience,
       showMoreLoadedExperiences,
       setCategoryFilter,
+      setStartDateFilter,
+      setEndDateFilter,
     },
   }
 }
@@ -344,24 +356,34 @@ const experiencesReducer = (
       }
     }
 
+    case actionTypes.setStartDateFilter: {
+      const { startDate } = payload
+
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          startDate: startDate ?? null,
+        },
+      }
+    }
+
+    case actionTypes.setEndDateFilter: {
+      const { endDate } = payload
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          endDate: endDate ?? null,
+        },
+      }
+    }
+
     case actionTypes.errorOccured: {
       return {
         ...state,
         status: statusNames.error,
         statusMessage: payload.message,
-      }
-    }
-
-    case actionTypes.clearExpereinces: {
-      return {
-        ...state,
-        loadedExperiences: [],
-        shownExperiences: [],
-        nextQuery: null,
-        isOutOfQueries: true,
-        status: statusNames.clearedExperiences,
-        statusMessage: null,
-        firstLoadCompleted: false,
       }
     }
 

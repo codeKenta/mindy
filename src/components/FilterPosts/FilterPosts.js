@@ -8,60 +8,80 @@ import styles from '@styling'
 import { useExperiences } from '@hooks/useExperiences'
 
 import Categories from '@components/Categories/Categories'
-// import DateInput from '@components/Forms/DateInput/DateInput'
 import DatePicker from 'react-datepicker'
 
-const Wrapper = styled.div`
-  margin-bottom: 20px;
-`
-
-const FilterPosts = () => {
-  const theme = useTheme()
-
+const getStyles = theme => {
   const StyledDatePicker = styled(DatePicker)`
     box-sizing: border-box;
     display: block;
     width: 100%;
     border: 1px solid ${theme.primary};
     border-radius: 10px;
-    background: ${theme.fieldBackground};
+    background: none;
     padding: ${styles.space.s};
     color: inherit;
   `
 
+  const Label = styled.span`
+    display: block;
+    width: max-content;
+    border-bottom: 2px solid ${theme.primary};
+    margin-bottom: ${styles.space.s};
+  `
+
+  const Wrapper = styled.div`
+    margin-bottom: 20px;
+  `
+
+  const Group = styled.div`
+    &:first-of-type {
+      margin-right: 20px;
+    }
+  `
+
+  const DateWrapper = styled.div`
+    display: flex;
+    margin-bottom: 20px;
+    justify-content: center;
+  `
+
+  return {
+    StyledDatePicker,
+    Wrapper,
+    DateWrapper,
+    Group,
+    Label,
+  }
+}
+
+const FilterPosts = () => {
+  const theme = useTheme()
+  const { StyledDatePicker, Wrapper, DateWrapper, Group, Label } = getStyles(
+    theme
+  )
+
   const {
     firstLoadCompleted,
     filter: { categories, startDate, endDate },
-    filter,
-    actions: { getExperiences, setCategoryFilter },
+    actions: {
+      getExperiences,
+      setCategoryFilter,
+      setStartDateFilter,
+      setEndDateFilter,
+    },
   } = useExperiences()
 
-  // const [categories, setCategories] = useState(filter?.categories ?? [])
-  // const [startDate, setStartDate] = useState(filter.fromDate)
-  // const [endDate, setEndDate] = useState(filter.toDate)
+  function handleStartDate(date) {
+    setStartDateFilter(date)
+  }
+  function handleEndDate(date) {
+    setEndDateFilter(date)
+  }
 
-  // function handleStartDate(date) {
-  //   console.log('HANDLE START', date, new Date(date))
-  //   setStartDate(new Date(date))
-  // }
-  // function handleEndDate(date) {
-  //   console.log('HANDLE END', date, new Date(date))
-
-  //   setEndDate(new Date(date))
-  // }
-
-  // console.log('both dates', { startDate, endDate })
-
-  console.log({
-    categories: filter.categories,
-    start: filter.startDate,
-    end: filter.endDate,
-  })
   const mountedRef = useRef()
 
   useEffect(() => {
     if (firstLoadCompleted && mountedRef.current) {
-      console.log('FILTERING EFFECT')
       function handleGetExperiences() {
         getExperiences(true)
       }
@@ -71,7 +91,7 @@ const FilterPosts = () => {
       })
       throttledGetExperiences()
     }
-  }, [categories])
+  }, [categories, startDate, endDate])
 
   useEffect(() => {
     mountedRef.current = true
@@ -79,29 +99,37 @@ const FilterPosts = () => {
 
   return (
     <Wrapper>
+      <DateWrapper>
+        <Group>
+          <Label>From</Label>
+          <StyledDatePicker
+            selectsStart
+            selected={startDate}
+            endDate={endDate}
+            onChange={handleStartDate}
+            maxDate={new Date()}
+          />
+        </Group>
+
+        <Group>
+          <Label>To</Label>
+
+          <StyledDatePicker
+            selectsEnd
+            selected={endDate}
+            startDate={startDate}
+            endDate={endDate}
+            onChange={handleEndDate}
+            minDate={startDate}
+            maxDate={new Date()}
+          />
+        </Group>
+      </DateWrapper>
       <Categories
         useToFilter={true}
         activeCategories={categories}
         setActiveCategories={setCategoryFilter}
       />
-
-      {/* <StyledDatePicker
-        selectsStart
-        selected={startDate}
-        endDate={endDate}
-        onChange={handleStartDate}
-        maxDate={new Date()}
-      />
-
-      <StyledDatePicker
-        selectsEnd
-        selected={endDate}
-        startDate={startDate}
-        endDate={endDate}
-        onChange={handleEndDate}
-        minDate={startDate}
-        maxDate={new Date()}
-      /> */}
     </Wrapper>
   )
 }

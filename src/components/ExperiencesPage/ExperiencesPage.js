@@ -81,7 +81,9 @@ const ExperiencesPage = () => {
   return (
     <Section>
       <Heading level={1}>Your experiences</Heading>
+
       <FilterPosts />
+
       {renderExperiences}
       {!isLoading && renderExperiences.length === 0 && (
         <NoStories>

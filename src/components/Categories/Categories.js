@@ -12,7 +12,6 @@ const getStyles = theme => {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    background: ${theme.fieldBackground};
     padding: ${styles.space.s};
   `
   const ChipWrapper = styled.div`
