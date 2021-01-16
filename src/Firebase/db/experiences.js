@@ -92,7 +92,11 @@ const filterQuery = (query, categories, startDate, endDate) => {
     endDate &&
     convertDateToIsoString(startDate) !== convertDateToIsoString(endDate)
   ) {
-    query = query.where('date', '<=', convertDateToIsoString(endDate))
+
+    let newEndDate = new Date(endDate)
+    newEndDate.setDate(newEndDate.getDate() + 1)
+
+    query = query.where('date', '<=', convertDateToIsoString(newEndDate))
   }
 
   if (categories.length > 0) {
